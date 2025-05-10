@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SocialApp.Pages.CreatePostPage"
+             Shell.NavBarIsVisible="False"
+             Title="Tạo bài viết">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Hàng 1: Thanh tiêu đề -->
+        <Grid Grid.Row="0" Padding="10" ColumnDefinitions="*,*,Auto">
+            <Label Grid.Column="0" Text="back" BackgroundColor="LightBlue" HorizontalOptions="Center" VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Column="1" Text="Cột 2" BackgroundColor="LightGreen" HorizontalOptions="Center" VerticalOptions="Center"/>
+            <!-- Header: Avatar và tên người dùng -->
+            <Grid Grid.Column="2" ColumnDefinitions="Auto, *" VerticalOptions="Start">
+                <!-- Avatar -->
+                <Image Source="account_circle.png"
+       HeightRequest="50"
+       WidthRequest="50"
+       Aspect="AspectFill"
+       Grid.Column="0">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnAvatarTapped"/>
+                    </Image.GestureRecognizers>
+                </Image>
+
+                <!-- Tên người dùng -->
+                <Label Text="Người dùng"
+       FontSize="16"
+       FontAttributes="Bold"
+       VerticalOptions="Center"
+       Grid.Column="1"
+       Margin="10,0,0,0"/>
+            </Grid>
+        </Grid>
+
+        <!-- Hàng 2: Nội dung cuộn -->
+        <ScrollView Grid.Row="1" >
+            <VerticalStackLayout Padding="10" Spacing="10">
+
+                
+
+                <!-- Entry: Nhập nội dung bài viết -->
+                <Border Stroke="Gray"
+                    HeightRequest="500"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 10">
+                    <Entry 
+                       Placeholder="Bạn đang nghĩ gì?"
+                       FontSize="25"
+                       VerticalOptions="Start"
+                       HeightRequest="100"
+                       Margin="10"/>
+                </Border>
+
+                <!-- Các tùy chọn đính kèm -->
+                <Grid ColumnDefinitions="*, *, *, *" ColumnSpacing="10">
+                    <!-- Thêm hình ảnh -->
+                    <Button Text="Ảnh/Video"
+                        ImageSource="image_icon.png"
+                        HorizontalOptions="FillAndExpand"
+                        BackgroundColor="Transparent"
+                        TextColor="Black"
+                        Clicked="OnAddImageClicked"
+                        Grid.Column="0"/>
+
+                    <!-- Thêm cảm xúc -->
+                    <Button Text="Cảm xúc"
+                        ImageSource="emotion_icon.png"
+                        HorizontalOptions="FillAndExpand"
+                        BackgroundColor="Transparent"
+                        TextColor="Black"
+                        Clicked="OnAddEmotionClicked"
+                        Grid.Column="1"/>
+
+                    <!-- Thêm vị trí -->
+                    <Button Text="Vị trí"
+                        ImageSource="location_icon.png"
+                        HorizontalOptions="FillAndExpand"
+                        BackgroundColor="Transparent"
+                        TextColor="Black"
+                        Clicked="OnAddLocationClicked"
+                        Grid.Column="2"/>
+
+                    <!-- Thêm tag bạn bè -->
+                    <Button Text="Tag bạn bè"
+                        ImageSource="tag_icon.png"
+                        HorizontalOptions="FillAndExpand"
+                        BackgroundColor="Transparent"
+                        TextColor="Black"
+                        Clicked="OnTagFriendsClicked"
+                        Grid.Column="3"/>
+                </Grid>
+
+                
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Hàng 3: Nút đăng bài -->
+        <!-- Nút đăng bài -->
+        <Button Grid.Row="2"
+            Text="Đăng"
+    BackgroundColor="#1877F2"
+    TextColor="White"
+    FontSize="20"
+    FontAttributes="Bold"
+    CornerRadius="5"
+    
+    Clicked="OnPostClicked"/>
+
+    </Grid>
+</ContentPage>

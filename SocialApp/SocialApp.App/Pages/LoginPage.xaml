@@ -1,0 +1,122 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SocialApp.App.Pages.LoginPage"
+             xmlns:vm="clr-namespace:SocialApp.App.ViewModels"
+             xmlns:controls="clr-namespace:SocialApp.App.Controls"
+             x:DataType="vm:LoginViewModel"
+             Title="LoginPage"
+             Shell.NavBarIsVisible="False"
+             Background="#E5E5E5">
+    <Grid Padding="20">
+        <Border Style="{StaticResource RoundedBorderWithShadow}"
+                Padding="20">
+            <VerticalStackLayout Spacing="15"
+                                 HorizontalOptions="Center">
+                <Image Source="paw_print.png"
+                       HeightRequest="80"
+                       WidthRequest="80" />
+                <Label Text="Login"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center" />
+
+                <Entry Placeholder="Email"
+                       Text="{Binding Email}"
+                       Keyboard="Email" />
+                <Entry Placeholder="Password"
+                       Text="{Binding Password}"
+                       IsPassword="True" />
+
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <CheckBox Grid.Column="0"
+                              Style="{StaticResource CheckBoxStyle}"
+                              IsChecked="{Binding RememberMe}"
+                              VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           Text="Remember Me"
+                           Style="{StaticResource RememberMeTextStyle}"
+                           VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRememberMeTapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <Label Grid.Column="2"
+                           Text="Forget Password?"
+                           FontSize="17"
+                           TextDecorations="Underline"
+                           TextColor="Blue"
+                           HorizontalOptions="End"
+                           VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnForgotPasswordTapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+
+                <Button BackgroundColor="#29ABE2"
+                        TextColor="White"
+                        Command="{Binding LoginCommand}"
+                        Style="{StaticResource rounded}"
+                        Text="Login" />
+
+                <StackLayout Orientation="Horizontal"
+                             HorizontalOptions="Center">
+                    <BoxView BackgroundColor="Gray"
+                             HeightRequest="1"
+                             WidthRequest="80" />
+                    <Label Text="  OR  "
+                           FontSize="14"
+                           TextColor="Gray" />
+                    <BoxView BackgroundColor="Gray"
+                             HeightRequest="1"
+                             WidthRequest="80" />
+                </StackLayout>
+
+                <Label Text="Don't have an account? Sign Up"
+                       FontSize="17"
+                       HorizontalOptions="Center"
+                       TextColor="Blue">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnSignUpTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <HorizontalStackLayout Spacing="20"
+                                       HorizontalOptions="Center">
+                    <Image Source="google_icon.png"
+                           HeightRequest="40"
+                           WidthRequest="40">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnGoogleSignInTapped" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                    <Image Source="facebook_icon.png"
+                           HeightRequest="40"
+                           WidthRequest="40">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnFacebookSignInTapped" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                    <Image Source="apple_icon.png"
+                           HeightRequest="40"
+                           WidthRequest="40">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnAppleSignInTapped" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center" />
+    </Grid>
+</ContentPage>

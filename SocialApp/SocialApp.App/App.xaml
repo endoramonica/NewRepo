@@ -1,0 +1,121 @@
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SocialApp.App"
+             xmlns:templates="clr-namespace:SocialApp.App.Templates"
+             x:Class="SocialApp.App.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Import Styles.xaml để dùng StaticResource -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+
+
+            <!-- Tệp chứa các Key -->
+            <!-- Style cho Button với bo góc 20 -->
+            <Style x:Key="rounded" TargetType="Button">
+                <Setter Property="CornerRadius" Value="20"/>
+            </Style>
+
+            <!-- Style Button Màu Xanh -->
+            <Style x:Key="primaryButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="Blue"/>
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="CornerRadius" Value="15"/>
+            </Style>
+
+            <Style x:Key="RoundedBorderWithShadow" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="White"/>
+                <Setter Property="WidthRequest" Value="400"/>
+                <Setter Property="MaximumWidthRequest" Value="400"/>
+                <Setter Property="HeightRequest" Value="600"/>
+                <Setter Property="HorizontalOptions" Value="Center"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <Setter Property="Shadow">
+                    <Setter.Value>
+                        <Shadow Brush="Black" Offset="5,5" Opacity="0.35" Radius="15"/>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="StrokeShape">
+                    <Setter.Value>
+                        <RoundRectangle CornerRadius="30"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="FadedLineStyle" TargetType="BoxView">
+                <Setter Property="HeightRequest" Value="1"/>
+                <!-- Độ dày của đường kẻ -->
+                <Setter Property="BackgroundColor" Value="Gray"/>
+                <!-- Màu của đường kẻ -->
+                <Setter Property="Opacity" Value="0.5"/>
+                <!-- Độ trong suốt (mờ) -->
+                <Setter Property="HorizontalOptions" Value="Fill"/>
+                <!-- Chiều ngang toàn bộ -->
+                <Setter Property="VerticalOptions" Value="Center"/>
+                <!-- Căn giữa theo chiều dọc -->
+            </Style>
+            <!-- Style cho CheckBox -->
+            <Style x:Key="CheckBoxStyle" TargetType="CheckBox">
+                <Setter Property="Color" Value="Green"/>
+                <!-- Màu của checkbox khi được chọn -->
+                <Setter Property="WidthRequest" Value="24"/>
+                <Setter Property="HeightRequest" Value="24"/>
+                <Setter Property="VerticalOptions" Value="Center"/>
+            </Style>
+
+            <Style x:Key="GradientButtonStyle" TargetType="Button">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#FF5733" Offset="0.0" />
+                            <GradientStop Color="#FFC300" Offset="0.5" />
+                            <GradientStop Color="#33FF57" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="CornerRadius" Value="25"/>
+                <Setter Property="TextColor" Value="White"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="Padding" Value="15"/>
+            </Style>
+
+            <!-- Style cho CarouselView -->
+            <Style x:Key="CarouselStyle" TargetType="CarouselView">
+                <Setter Property="HeightRequest" Value="300"/>
+                <Setter Property="Loop" Value="True"/>
+            </Style>
+
+            <!-- Style cho Image trong Carousel -->
+            <Style x:Key="CarouselImageStyle" TargetType="Image">
+                <Setter Property="Aspect" Value="AspectFill"/>
+            </Style>
+
+            
+            <!--DataTemplates -->
+            <DataTemplate x:Key="postWithImageTemplate" >
+                <templates:PostImage />
+            </DataTemplate>
+            
+            <DataTemplate x:Key="postWithNoImageTemplate">
+                <templates:PostNoImage />
+            </DataTemplate>
+
+            <DataTemplate x:Key="postWithOnlyImageTemplate">
+                <templates:PostOnlyImage />
+            </DataTemplate>
+
+            <templates:PostTemplateSelector
+                x:Key=" postDataTemplateSelector"
+                OnlyImage="{StaticResource postWithOnlyImageTemplate}"
+                WithImage="{StaticResource postWithImageTemplate}"
+                WithNoImage="{StaticResource postWithNoImageTemplate}"
+                />
+            
+            
+        </ResourceDictionary>
+    </Application.Resources>
+    
+</Application>

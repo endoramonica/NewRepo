@@ -1,0 +1,462 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:y="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:controls="clr-namespace:SocialApp.Controls"
+    x:Class="SocialApp.Pages.HomePage"
+    BackgroundColor="Gray">
+
+    <!-- Phần TitleView của Shell -->
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="Auto, *, Auto" Padding="10,0">
+
+            <!-- Tiêu đề trang -->
+            <Label Text="Home" FontSize="22" FontAttributes="Bold" VerticalOptions="Center" />
+
+            <!-- Phần chứa các icon bên phải -->
+            <Grid Grid.Column="2" ColumnDefinitions="Auto, Auto, Auto" Padding="10" ColumnSpacing="10" HorizontalOptions="End">
+
+                <!-- Icon thông báo với badge -->
+                <Grid Grid.Column="0">
+                    <Image Source="notifications.png" HeightRequest="24" WidthRequest="24" VerticalOptions="Center" HorizontalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnNotificationTapped" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                    <Ellipse Fill="Yellow" WidthRequest="12" HeightRequest="12" Stroke="Red" StrokeThickness="2" VerticalOptions="Start" HorizontalOptions="End" Margin="2" />
+                </Grid>
+
+                <!-- Icon thêm -->
+                <Image Grid.Column="1" Source="add_box.png" HeightRequest="30" WidthRequest="30" VerticalOptions="Center">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1" />
+                    </Image.GestureRecognizers>
+                </Image>
+
+                <!-- Icon hồ sơ -->
+                <Image Grid.Column="2" Source="account_circle.png" HeightRequest="30" WidthRequest="30" VerticalOptions="Center">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnProfileTapped" />
+                    </Image.GestureRecognizers>
+                </Image>
+            </Grid>
+        </Grid>
+    </Shell.TitleView>
+
+    <!--Bên trong Board -->
+    <Grid>
+        <!--Bên trong trang -->
+        <ScrollView>
+            <VerticalStackLayout Spacing="10" Padding="10">
+
+                <!-- Khung chứa bài viết 1 -->
+                <Border Padding="8" StrokeThickness="0" BackgroundColor="White">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto,Auto" RowSpacing="8">
+
+                        <!-- Phần thông tin người đăng -->
+                        <Grid ColumnDefinitions="40, Auto, *" ColumnSpacing="5" Padding="5">
+
+                            <!-- Avatar -->
+                            <Border Grid.Column="0"
+ HeightRequest="40"
+ WidthRequest="40"
+ StrokeShape="RoundRectangle 20"
+ BackgroundColor="Aqua">
+                                <Image Source="logo.png"
+    WidthRequest="30"
+    HeightRequest="30"
+    VerticalOptions="Center"
+    HorizontalOptions="Center"
+    Aspect="AspectFit" />
+                            </Border>
+
+                            <!-- Thông tin người dùng -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+    Text="Abhay Prince"
+    VerticalOptions="Center" />
+
+                                <Label FontSize="12"
+    Text="04 Jan 2025"
+    VerticalOptions="Center"
+    TextColor="Gray" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Hình ảnh bài viết -->
+                        <Border Grid.Row="1" BackgroundColor="DeepPink" StrokeThickness="0">
+                            <Image Aspect="AspectFill"
+HeightRequest="250"
+Source="bird.png"
+HorizontalOptions="Fill"
+VerticalOptions="Fill" />
+                        </Border>
+
+                        <!-- Nội dung bài viết -->
+                        <Label Grid.Row="2"
+Text="Some random post text will go here"
+Padding="10,5"
+FontSize="14"
+TextColor="Black" />
+
+                        <!-- Đường kẻ mờ -->
+                        <BoxView Grid.Row="3" Style="{StaticResource FadedLineStyle}" />
+
+                        <!-- Gọi lại PostActionButtons -->
+                        <controls:PostActionButtons Grid.Row="4" Padding="5" />
+
+                    </Grid>
+
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                    </Border.GestureRecognizers>
+
+                </Border>
+
+                <!-- Khung chứa bài viết 2 -->
+                <Border Padding="8" StrokeThickness="0" BackgroundColor="White">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto,Auto" RowSpacing="8">
+
+                        <!-- Phần thông tin người đăng -->
+                        <Grid ColumnDefinitions="40, Auto, *" ColumnSpacing="5" Padding="5">
+
+                            <!-- Avatar -->
+                            <Border Grid.Column="0"
+              HeightRequest="40"
+              WidthRequest="40"
+              StrokeShape="RoundRectangle 20"
+              BackgroundColor="Aqua">
+                                <Image Source="logo.png"
+                 WidthRequest="30"
+                 HeightRequest="30"
+                 VerticalOptions="Center"
+                 HorizontalOptions="Center"
+                 Aspect="AspectFit" />
+                            </Border>
+
+                            <!-- Thông tin người dùng -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+                 Text="Abhay Prince"
+                 VerticalOptions="Center" />
+
+                                <Label FontSize="12"
+                 Text="04 Jan 2025"
+                 VerticalOptions="Center"
+                 TextColor="Gray" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Hình ảnh bài viết -->
+                        <Border Grid.Row="1" BackgroundColor="LightSalmon" StrokeThickness="0">
+                            <Image Aspect="AspectFill"
+             HeightRequest="250"
+             Source="bird.png"
+             HorizontalOptions="Fill"
+             VerticalOptions="Fill" />
+                        </Border>
+
+                        <!-- Nội dung bài viết -->
+                        <Label Grid.Row="2"
+             Text="Some random post text will go here"
+             Padding="10,5"
+             FontSize="14"
+             TextColor="Black" />
+
+                        <!-- Đường kẻ mờ -->
+                        <BoxView Grid.Row="3" Style="{StaticResource FadedLineStyle}" />
+
+                        <!-- Gọi lại PostActionButtons -->
+                        <controls:PostActionButtons Grid.Row="4" Padding="5" />
+
+                    </Grid>
+
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                    </Border.GestureRecognizers>
+                    
+                </Border>
+
+                <!-- Khung chứa bài viết 3 -->
+                <Border Padding="8" StrokeThickness="0" BackgroundColor="White">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto,Auto" RowSpacing="8">
+
+                        <!-- Phần thông tin người đăng -->
+                        <Grid ColumnDefinitions="40, Auto, *" ColumnSpacing="5" Padding="5">
+
+                            <!-- Avatar -->
+                            <Border Grid.Column="0"
+ HeightRequest="40"
+ WidthRequest="40"
+ StrokeShape="RoundRectangle 20"
+ BackgroundColor="Aqua">
+                                <Image Source="logo.png"
+    WidthRequest="30"
+    HeightRequest="30"
+    VerticalOptions="Center"
+    HorizontalOptions="Center"
+    Aspect="AspectFit" />
+                            </Border>
+
+                            <!-- Thông tin người dùng -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+    Text="Abhay Prince"
+    VerticalOptions="Center" />
+
+                                <Label FontSize="12"
+    Text="04 Jan 2025"
+    VerticalOptions="Center"
+    TextColor="Gray" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Hình ảnh bài viết -->
+                        <Border Grid.Row="1" BackgroundColor="LawnGreen" StrokeThickness="0">
+                            <Image Aspect="AspectFill"
+HeightRequest="250"
+Source="bird.png"
+HorizontalOptions="Fill"
+VerticalOptions="Fill" />
+                        </Border>
+
+                        <!-- Nội dung bài viết -->
+                        <Label Grid.Row="2"
+Text="Some random post text will go here"
+Padding="10,5"
+FontSize="14"
+TextColor="Black" />
+
+                        <!-- Đường kẻ mờ -->
+                        <BoxView Grid.Row="3" Style="{StaticResource FadedLineStyle}" />
+
+                        <!-- Gọi lại PostActionButtons -->
+                        <controls:PostActionButtons Grid.Row="4" Padding="5" />
+
+                    </Grid>
+
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                    </Border.GestureRecognizers>
+
+                </Border>
+
+                <!-- Khung chứa bài viết 4 -->
+                <Border Padding="8" StrokeThickness="0" BackgroundColor="White">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto,Auto" RowSpacing="8">
+
+                        <!-- Phần thông tin người đăng -->
+                        <Grid ColumnDefinitions="40, Auto, *" ColumnSpacing="5" Padding="5">
+
+                            <!-- Avatar -->
+                            <Border Grid.Column="0"
+ HeightRequest="40"
+ WidthRequest="40"
+ StrokeShape="RoundRectangle 20"
+ BackgroundColor="Aqua">
+                                <Image Source="logo.png"
+    WidthRequest="30"
+    HeightRequest="30"
+    VerticalOptions="Center"
+    HorizontalOptions="Center"
+    Aspect="AspectFit" />
+                            </Border>
+
+                            <!-- Thông tin người dùng -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+    Text="Abhay Prince"
+    VerticalOptions="Center" />
+
+                                <Label FontSize="12"
+    Text="04 Jan 2025"
+    VerticalOptions="Center"
+    TextColor="Gray" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Hình ảnh bài viết -->
+                        <Border Grid.Row="1" BackgroundColor="DeepPink" StrokeThickness="0">
+                            <Image Aspect="AspectFill"
+HeightRequest="250"
+Source="bird.png"
+HorizontalOptions="Fill"
+VerticalOptions="Fill" />
+                        </Border>
+
+                        <!-- Nội dung bài viết -->
+                        <Label Grid.Row="2"
+Text="Some random post text will go here"
+Padding="10,5"
+FontSize="14"
+TextColor="Black" />
+
+                        <!-- Đường kẻ mờ -->
+                        <BoxView Grid.Row="3" Style="{StaticResource FadedLineStyle}" />
+
+                        <!-- Gọi lại PostActionButtons -->
+                        <controls:PostActionButtons Grid.Row="4" Padding="5" />
+
+                    </Grid>
+
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                    </Border.GestureRecognizers>
+
+                </Border>
+
+                <!-- Khung chứa bài viết 5 -->
+                <Border Padding="8" StrokeThickness="0" BackgroundColor="White">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto,Auto" RowSpacing="8">
+
+                        <!-- Phần thông tin người đăng -->
+                        <Grid ColumnDefinitions="40, Auto, *" ColumnSpacing="5" Padding="5">
+
+                            <!-- Avatar -->
+                            <Border Grid.Column="0"
+              HeightRequest="40"
+              WidthRequest="40"
+              StrokeShape="RoundRectangle 20"
+              BackgroundColor="Aqua">
+                                <Image Source="logo.png"
+                 WidthRequest="30"
+                 HeightRequest="30"
+                 VerticalOptions="Center"
+                 HorizontalOptions="Center"
+                 Aspect="AspectFit" />
+                            </Border>
+
+                            <!-- Thông tin người dùng -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+                 Text="Abhay Prince"
+                 VerticalOptions="Center" />
+
+                                <Label FontSize="12"
+                 Text="04 Jan 2025"
+                 VerticalOptions="Center"
+                 TextColor="Gray" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Hình ảnh bài viết -->
+                        <Border Grid.Row="1" BackgroundColor="LightSalmon" StrokeThickness="0">
+                            <Image Aspect="AspectFill"
+             HeightRequest="250"
+             Source="bird.png"
+             HorizontalOptions="Fill"
+             VerticalOptions="Fill" />
+                        </Border>
+
+                        <!-- Nội dung bài viết -->
+                        <Label Grid.Row="2"
+             Text="Some random post text will go here"
+             Padding="10,5"
+             FontSize="14"
+             TextColor="Black" />
+
+                        <!-- Đường kẻ mờ -->
+                        <BoxView Grid.Row="3" Style="{StaticResource FadedLineStyle}" />
+
+                        <!-- Gọi lại PostActionButtons -->
+                        <controls:PostActionButtons Grid.Row="4" Padding="5" />
+
+                    </Grid>
+
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                    </Border.GestureRecognizers>
+
+                </Border>
+
+                <!-- Khung chứa bài viết 6 -->
+                <Border Padding="8" StrokeThickness="0" BackgroundColor="White">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto,Auto" RowSpacing="8">
+
+                        <!-- Phần thông tin người đăng -->
+                        <Grid ColumnDefinitions="40, Auto, *" ColumnSpacing="5" Padding="5">
+
+                            <!-- Avatar -->
+                            <Border Grid.Column="0"
+ HeightRequest="40"
+ WidthRequest="40"
+ StrokeShape="RoundRectangle 20"
+ BackgroundColor="Aqua">
+                                <Image Source="logo.png"
+    WidthRequest="30"
+    HeightRequest="30"
+    VerticalOptions="Center"
+    HorizontalOptions="Center"
+    Aspect="AspectFit" />
+                            </Border>
+
+                            <!-- Thông tin người dùng -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label FontAttributes="Bold"
+    Text="Abhay Prince"
+    VerticalOptions="Center" />
+
+                                <Label FontSize="12"
+    Text="04 Jan 2025"
+    VerticalOptions="Center"
+    TextColor="Gray" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Hình ảnh bài viết -->
+                        <Border Grid.Row="1" BackgroundColor="LawnGreen" StrokeThickness="0">
+                            <Image Aspect="AspectFill"
+HeightRequest="250"
+Source="bird.png"
+HorizontalOptions="Fill"
+VerticalOptions="Fill" />
+                        </Border>
+
+                        <!-- Nội dung bài viết -->
+                        <Label Grid.Row="2"
+Text="Some random post text will go here"
+Padding="10,5"
+FontSize="14"
+TextColor="Black" />
+
+                        <!-- Đường kẻ mờ -->
+                        <BoxView Grid.Row="3" Style="{StaticResource FadedLineStyle}" />
+
+                        <!-- Gọi lại PostActionButtons -->
+                        <controls:PostActionButtons Grid.Row="4" Padding="5" />
+
+                    </Grid>
+
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                    </Border.GestureRecognizers>
+
+                </Border>
+
+
+            </VerticalStackLayout>
+        </ScrollView>
+        <!--Nút nổi -->
+        <Border StrokeThickness="2"
+        Stroke="White"
+        BackgroundColor="LightPink"
+        Padding="5"
+        
+        VerticalOptions="End"
+        WidthRequest="60"
+        HeightRequest="60"
+        StrokeShape="RoundRectangle 20">
+            <Image 
+           Source="logo.png"
+           WidthRequest="50"
+           HeightRequest="50"
+                Opacity="0.5"/>
+            <Border.Shadow>
+                <Shadow Brush="Black" Radius="25"/>
+            </Border.Shadow>
+        </Border>
+
+    </Grid>
+
+</ContentPage>

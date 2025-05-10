@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SocialApp.App.Pages.LandingPage"
+             BackgroundColor="Black"
+             Shell.NavBarIsVisible="False"
+            
+            
+             Title="LandingPage">
+
+
+
+    <Grid RowDefinitions="*,Auto,*,Auto">
+        <!-- Grid con chứa hình ảnh, tiêu đề, mô tả -->
+        <Grid 
+         BackgroundColor="Brown"
+         Grid.Row="1"
+         HorizontalOptions="Center"
+         VerticalOptions="Center"
+         RowSpacing="10"
+         RowDefinitions="Auto,Auto,Auto">
+
+            <!-- Circular Image with Shadow -->
+            <Border
+             Grid.Row="0"
+             StrokeShape="RoundRectangle"
+             Margin="10,10,10,20"
+             HeightRequest="250"
+             WidthRequest="250"
+             HorizontalOptions="Center"
+             StrokeThickness="0">
+                <Border.Shadow>
+                    <Shadow Brush="Yellow"
+                          Offset="5,1"
+                          Opacity="4"
+                          Radius="25"/>
+                </Border.Shadow>
+
+                <Image Source="logo.png"
+                    Aspect="AspectFit"
+                    HeightRequest="250"
+                    WidthRequest="250"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"/>
+            </Border>
+
+            
+            
+            <!-- Label mô tả -->
+            <Label 
+             Grid.Row="1"
+             FontAttributes="Bold"
+             HorizontalOptions="Center"
+             HorizontalTextAlignment="Center"
+             Text="Find your favorite friend close to you"
+             FontSize="30"
+             TextColor="White"/>
+
+            <VerticalStackLayout HorizontalOptions="Center" BackgroundColor="Blue" Grid.Row="2" Spacing="10">
+                <Label
+                 FontAttributes="Bold"
+                 FontSize="20"
+                 Text="Find your new best friend at our store!"
+                 TextColor="Beige"
+                 HorizontalOptions="Center"
+                 HorizontalTextAlignment="Center"/>
+                <Label
+                 FontAttributes="Bold"
+                 FontSize="20"
+                 Text="We have a wide range of selected lovable and cute pets, ready for adoption."
+                 TextColor="Beige"
+                 HorizontalOptions="Center"
+                 HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Nút "Get Started" đặt trong hàng 3 (Auto) của Grid chính -->
+        <StackLayout Grid.Row="3" BackgroundColor="LawnGreen"  VerticalOptions="End" Spacing="10" >
+            <Button
+             Text="Bắt đầu" 
+                HeightRequest="50"
+             WidthRequest="100"
+             Margin="20,0,0,50"
+             CornerRadius="30"
+             Background="Blue"
+                Clicked="Button_Clicked"
+             >
+                <Button.Shadow>
+                    <Shadow Brush="Pink" Radius="30" Opacity="2"  Offset="0,5"/>
+                </Button.Shadow>
+            </Button>
+
+
+        </StackLayout>
+    </Grid>
+
+
+
+</ContentPage>

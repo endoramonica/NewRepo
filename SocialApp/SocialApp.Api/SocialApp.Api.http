@@ -1,0 +1,178 @@
+@SocialApp.Api_HostAddress = https://localhost:7175
+
+GET {{SocialApp.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/usersapi
+Content-Type: application/json
+
+{
+ {
+  "name": "User",
+  "email": "user@example.com",
+  "password": "123456"
+}
+
+
+
+}
+
+###
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/usersapi/login
+Content-Type: application/json
+
+{
+  //LoginDto
+}
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/usersapi/login
+Content-Type: application/json
+
+{
+  //LoginDto
+}
+
+###
+
+PUT {{SocialApp.Api_HostAddress}}/api/usersapi/{id}
+Content-Type: application/json
+
+{
+  //Guid
+}
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/users
+Content-Type: application/json
+
+{
+  //User
+}
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/users
+Content-Type: application/json
+
+{
+  "id": "feae3178-81fb-46b3-923a-08dd6c338a22",
+  "name": "User",
+  "email": "user@example.com",
+  "passwordHarsh": "123456",
+  "photoPath": null,
+  "photoUrl": null
+}
+
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/users
+Content-Type: application/json
+
+{
+  //User
+}
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/users
+Content-Type: application/json
+{
+  "id": "ghae3178-81fb-46b3-923a-08dd6c338a22",
+  "name": "Tester",
+  "email": "user@example.com",
+  "passwordHash": "123456",
+  "photoPath": null,
+  "photoUrl": null
+}
+
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/users
+Content-Type: application/json
+
+{
+  //User
+}
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "123456"
+}
+
+
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/users
+Content-Type: application/json
+
+{
+  //User
+}
+
+###
+
+@startIndex=0
+@pageSize=0
+GET {{SocialApp.Api_HostAddress}}/api/user/bookmarked-posts?startIndex={{startIndex}}&pageSize={{pageSize}}
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/user/change-photo
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/users
+Content-Type: application/json
+
+{
+  //User
+}
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  
+  
+  "email": "testuser123@example.com",
+  "password": "StrongPassword123!"
+}
+
+
+###
+
+@SerializedSavePostDto=string
+POST {{SocialApp.Api_HostAddress}}/api/posts/save?SerializedSavePostDto={{SerializedSavePostDto}}
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  //LoginDto
+}
+
+###
+
+POST {{SocialApp.Api_HostAddress}}/api/posts/save?SerializedSavePostDto={{SerializedSavePostDto}}
+
+###

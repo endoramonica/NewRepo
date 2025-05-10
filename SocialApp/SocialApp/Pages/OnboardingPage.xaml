@@ -1,0 +1,11 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SocialApp.Pages.OnboardingPage"
+             xmlns:local="clr-namespace:SocialApp.Pages"
+
+             Title="OnboardingPage"
+             BackgroundColor="{StaticResource Primary}"
+             Shell.NavBarIsVisible="False">
+
+   
+</ContentPage>
