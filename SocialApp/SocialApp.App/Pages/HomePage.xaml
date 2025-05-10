@@ -23,7 +23,7 @@
                 <Grid Grid.Column="0">
                     <Image Source="notifications.png" HeightRequest="24" WidthRequest="24" VerticalOptions="Center" HorizontalOptions="Center">
                         <Image.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnNotificationTapped" />
+                            <TapGestureRecognizer Command="{Binding NavigateToNotificationCommand}" />
                         </Image.GestureRecognizers>
                     </Image>
                     <Ellipse Fill="Yellow" WidthRequest="12" HeightRequest="12" Stroke="Red" StrokeThickness="2" VerticalOptions="Start" HorizontalOptions="End" Margin="2" />
@@ -32,14 +32,14 @@
                 <!-- Icon thêm -->
                 <Image Grid.Column="1" Source="add_box.png" HeightRequest="30" WidthRequest="30" VerticalOptions="Center">
                     <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped_1" />
+                        <TapGestureRecognizer Command="{Binding NavigateToCreatePostCommand}" />
                     </Image.GestureRecognizers>
                 </Image>
 
                 <!-- Icon hồ sơ -->
                 <Image Grid.Column="2" Source="account_circle.png" HeightRequest="30" WidthRequest="30" VerticalOptions="Center">
                     <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnProfileTapped" />
+                        <TapGestureRecognizer Command="{Binding NavigateToProfileCommand}" />
                     </Image.GestureRecognizers>
                 </Image>
             </Grid>

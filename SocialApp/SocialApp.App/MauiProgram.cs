@@ -48,7 +48,7 @@ namespace SocialApp.App
         }
         private static void ConfigureRefit(IServiceCollection services)
         {
-            var baseApiUrl = "https://dm8bbtbb-7175.asse.devtunnels.ms";
+            var baseApiUrl = "https://qjk4ssln-7175.asse.devtunnels.ms";
 
 
 

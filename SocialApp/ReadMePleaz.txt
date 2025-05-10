@@ -1,4 +1,4 @@
-﻿
+﻿// add autoDBmigrations vao file programs trong .api 
 
 
 #27 Khởi tạo và điều hướng 

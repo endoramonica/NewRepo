@@ -34,7 +34,7 @@ namespace SocialApp.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Bookmarks");
+                    b.ToTable("Bookmarks", (string)null);
                 });
 
             modelBuilder.Entity("SocialApp.Api.Data.Entities.Comment", b =>
@@ -62,7 +62,7 @@ namespace SocialApp.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("SocialApp.Api.Data.Entities.Likes", b =>
@@ -77,7 +77,7 @@ namespace SocialApp.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Likes");
+                    b.ToTable("Likes", (string)null);
                 });
 
             modelBuilder.Entity("SocialApp.Api.Data.Entities.Notification", b =>
@@ -106,7 +106,7 @@ namespace SocialApp.Api.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("SocialApp.Api.Data.Entities.Post", b =>
@@ -144,7 +144,7 @@ namespace SocialApp.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("SocialApp.Api.Data.Entities.User", b =>
@@ -177,7 +177,7 @@ namespace SocialApp.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("SocialAppLibrary.Shared.Dtos.PostDto", b =>
@@ -212,7 +212,7 @@ namespace SocialApp.Api.Migrations
                     b.Property<string>("UserPhotoUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("PostDto");
+                    b.ToTable("PostDto", (string)null);
                 });
 
             modelBuilder.Entity("SocialApp.Api.Data.Entities.Bookmarks", b =>

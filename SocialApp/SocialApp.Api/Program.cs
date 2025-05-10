@@ -93,7 +93,7 @@ var app = builder.Build();
 app.MapControllers();
 
 #if DEBUG
-AutoMigrateDb(app.Services);
+
 #endif
 
 // Configure the HTTP request pipeline.
@@ -127,14 +127,6 @@ app.UseStaticFiles();
 
 //#23
 app.Run();
+// add autoDBmigrations 
 
-static void AutoMigrateDb(IServiceProvider sp)
-{
-    using var scope = sp.CreateScope();
-    var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-    if (dataContext.Database.GetPendingMigrations().Any())
-    {
-        dataContext.Database.Migrate();
-    }
-}
 
