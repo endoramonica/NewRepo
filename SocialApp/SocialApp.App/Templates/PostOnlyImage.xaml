@@ -69,9 +69,9 @@ Path=GoToPostDetailsPageCommand}" CommandParameter="{Binding .}"/>
 
             <!-- Gọi lại PostActionButtons -->
             <controls:PostActionButtons Grid.Row="4"
-                                        
-                                        Padding="5" />
-
+Post="{Binding .}"
+ViewModel="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}}}"
+Padding="5" />
         </Grid>
 
 

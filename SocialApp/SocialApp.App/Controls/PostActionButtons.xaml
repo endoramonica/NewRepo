@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"  
     xmlns:models="clr-namespace:SocialApp.App.Models"
+    xmlns:vm="clr-namespace:SocialApp.App.ViewModels"
     x:Class="SocialApp.App.Controls.PostActionButtons"
     x:Name="this"
     x:DataType="models:PostModel">
@@ -34,5 +35,12 @@
             HeightRequest="30"  
             Command="{Binding Source={x:Reference this}, Path=ViewModel.GoToPostDetailsPageCommand}"  
             CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />
+        <!-- Share Button -->
+        <ImageButton 
+            Source="share.png"  
+            WidthRequest="30"  
+            HeightRequest="30"  
+            Command="{Binding Source={x:Reference this}, Path=ViewModel.SharePostCommand}"  
+            CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />    
     </HorizontalStackLayout>
 </ContentView>

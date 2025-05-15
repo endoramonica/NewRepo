@@ -81,15 +81,13 @@
             <!-- Đường kẻ mờ -->
             <BoxView Grid.Row="3"
                      Style="{StaticResource FadedLineStyle}" />
-
             <!-- Gọi lại PostActionButtons -->
             <controls:PostActionButtons Grid.Row="4"
-                                    
-                            HorizontalOptions="Fill"
-                            VerticalOptions="Start"
-                            Padding="5" 
-                                       
-                                        />
+Post="{Binding .}"
+ViewModel="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}}}"
+Padding="5" />
+
+
 
 
 

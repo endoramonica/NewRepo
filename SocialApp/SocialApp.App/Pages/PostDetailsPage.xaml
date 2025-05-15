@@ -82,8 +82,13 @@
                 <BoxView HeightRequest="1" BackgroundColor="#dddddd"/>
 
                 <!-- Nút hành động -->
-                <controls:PostActionButtons 
-    />
+                <controls:PostActionButtons Grid.Row="4"
+ Post="{Binding Post}" 
+ ViewModel="{Binding .}"        
+HorizontalOptions="Fill"
+VerticalOptions="Start"
+Padding="5" />
+
 
 
 
