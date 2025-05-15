@@ -83,12 +83,9 @@
 
                 <!-- Nút hành động -->
                 <controls:PostActionButtons Grid.Row="4"
- Post="{Binding Post}" 
- ViewModel="{Binding .}"        
-HorizontalOptions="Fill"
-VerticalOptions="Start"
-Padding="5" />
-
+                                Post="{Binding Post}"
+                                ViewModel="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}}}"
+                                Padding="5" />
 
 
 

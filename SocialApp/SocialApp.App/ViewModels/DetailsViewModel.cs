@@ -38,11 +38,33 @@ public partial class DetailsViewModel : PostBaseViewModel
     public ObservableCollection<CommentDto> Comments { get; set; } = [];
 
 
-    partial void OnPostChanged(PostModel value)
+     async partial void   OnPostChanged(PostModel value)
     {
         IsOwner = _authService.User?.ID == value.UserId; // Check if the current user is the owner of the post
-                                                         // Fetch the comments for the post
-        Debug.WriteLine($"PostId: {Post.PostId}, UserPhotoUrl: {Post.UserPhotoUrl}, PhotoUrl: {Post.PhotoUrl}");
+        await FetchCommentsAsync();                                                    // Fetch the comments for the post
+       
+    }
+    private int _startIndex = 0;
+    private const int _pageSize = 10;
+    [RelayCommand]
+    private async Task FetchCommentsAsync()
+    {
+        await MakeApiCall(async () =>
+        {
+            var comments = await PostApi.GetCommentsAsync(Post.PostId, _startIndex, _pageSize);
+            if (comments.Length > 0)
+            {
+                _startIndex += comments.Length; // Update the start index for pagination
+                foreach (var c in comments)
+                {
+                    Comments.Add(c);
+                }
+            }
+            else
+            {
+                await ToastAsync("No comments found.");
+            }
+        });
     }
 
     [ObservableProperty]
