@@ -7,7 +7,7 @@
              x:Class="SocialApp.App.Pages.HomePage"
     xmlns:vm ="clr-namespace:SocialApp.App.ViewModels"
              x:DataType="vm:HomeViewModels"
-    BackgroundColor="Gray">
+    BackgroundColor="LightGray">
 
     <!-- Phần TitleView của Shell -->
     <Shell.TitleView>
@@ -47,9 +47,18 @@
     </Shell.TitleView>
 
     <!--Bên trong Board -->
-    <Grid>
+    <RefreshView Command="{Binding RefreshPostCommand}" IsRefreshing="{Binding IsRefreshView}">
+        <Grid>
         <!--Bên trong trang -->
-        <CollectionView ItemTemplate="{StaticResource  postDataTemplateSelector}" ItemsSource="{Binding Posts}" />
+            <CollectionView
+                ItemTemplate="{StaticResource postDataTemplateSelector}"
+                ItemsSource="{Binding Posts}"
+                RemainingItemsThreshold="2"
+                RemainingItemsThresholdReachedCommand="{Binding FetchPostCommand}"> 
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                </CollectionView.ItemsLayout>
+            </CollectionView>
 
 
 
@@ -60,8 +69,7 @@
 
 
 
-
-        <!--Nút nổi -->
+            <!--Nút nổi -->
         <Border StrokeThickness="2"
         Stroke="White"
         BackgroundColor="LightPink"
@@ -79,8 +87,12 @@
             <Border.Shadow>
                 <Shadow Brush="Black" Radius="25"/>
             </Border.Shadow>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding NavigateToCreatePostCommand}"/>
+            </Border.GestureRecognizers>
         </Border>
 
+        <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" IsRunning="{Binding IsBusy}"/>
     </Grid>  
-
+  </RefreshView>
 </ContentPage>

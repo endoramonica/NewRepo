@@ -1,30 +1,38 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SocialApp.App.Controls.PostActionButtons">
-    <FlexLayout JustifyContent="SpaceAround" AlignItems="Center" Wrap="NoWrap">
-        <!-- Nút Like -->
-        <HorizontalStackLayout Spacing="5">
-            <Image HeightRequest="20" WidthRequest="20" Source="pink_heart.png" VerticalOptions="Center" />
-            <Label FontSize="12" Text="Like" VerticalOptions="Center" />
-        </HorizontalStackLayout>
+<ContentView 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"  
+    xmlns:models="clr-namespace:SocialApp.App.Models"
+    x:Class="SocialApp.App.Controls.PostActionButtons"
+    x:Name="this"
+    x:DataType="models:PostModel">
 
-        <!-- Nút Comment -->
-        <HorizontalStackLayout Spacing="5">
-            <Image HeightRequest="20" WidthRequest="20" Source="bomb.png" VerticalOptions="Center" />
-            <Label FontSize="12" Text="Comment" VerticalOptions="Center" />
-        </HorizontalStackLayout>
+    <HorizontalStackLayout Spacing="15" Padding="10">
 
-        <!-- Nút Save -->
-        <HorizontalStackLayout Spacing="5">
-            <Image HeightRequest="20" WidthRequest="20" Source="pin_drop.png" VerticalOptions="Center" />
-            <Label FontSize="12" Text="Save" VerticalOptions="Center" />
-        </HorizontalStackLayout>
+        <!-- Like Button -->
+        <ImageButton 
+            Source="{Binding IsLikedIcon}"  
+            BackgroundColor="Pink"
+            WidthRequest="30"  
+            HeightRequest="30"  
+            Command="{Binding Source={x:Reference this}, Path=ViewModel.ToggleLikeCommand}"  
+            CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />
 
-        <!-- Nút Share -->
-        <HorizontalStackLayout Spacing="5">
-            <Image HeightRequest="20" WidthRequest="20" Source="share.png" VerticalOptions="Center" />
-            <Label FontSize="12" Text="Share" VerticalOptions="Center" />
-        </HorizontalStackLayout>
-    </FlexLayout>
+        <!-- Bookmark Button -->
+        <ImageButton 
+            Source="{Binding IsBookmarkedIcon}" 
+            BackgroundColor="SandyBrown"
+            WidthRequest="30"  
+            HeightRequest="30"  
+            Command="{Binding Source={x:Reference this}, Path=ViewModel.ToggleBookMarkCommand}"  
+            CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />
+
+        <!-- Comment Button -->
+        <ImageButton 
+            Source="message_circle_heart.png"  
+            WidthRequest="30"  
+            HeightRequest="30"  
+            Command="{Binding Source={x:Reference this}, Path=ViewModel.GoToPostDetailsPageCommand}"  
+            CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />
+    </HorizontalStackLayout>
 </ContentView>

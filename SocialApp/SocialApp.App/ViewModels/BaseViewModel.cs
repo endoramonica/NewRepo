@@ -1,8 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Refit;
-using SocialApp.App.Pages;
-using CommunityToolkit.Maui.Alerts;
+﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Refit;
+using SocialApp.App.Apis;
+using SocialApp.App.Pages;
+using SocialAppLibrary.Shared.Dtos;
 
 namespace SocialApp.App.ViewModels;
 
@@ -16,6 +19,8 @@ public partial class BaseViewModel : ObservableObject
 
     protected async Task NavigationAsync(string url) =>
         await Shell.Current.GoToAsync(url, animate: true);
+    protected async Task NavigationAsync(string url , Dictionary<string,object> parameters) =>
+        await Shell.Current.GoToAsync(url, animate: true,parameters);
     protected async Task NavigateBackAsync() => await NavigationAsync("..");
        
     protected async Task ToastAsync(string message)
@@ -54,5 +59,6 @@ public partial class BaseViewModel : ObservableObject
             IsBusy = false;
         }
     }
+    
 }
 

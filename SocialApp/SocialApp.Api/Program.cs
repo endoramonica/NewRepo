@@ -105,16 +105,18 @@ if (app.Environment.IsDevelopment())
 
 }
 app.UseHttpsRedirection();// chatgpt Xoá dòng này để chạy HTTP
-app.Use(async (context, next) =>
-{
-    context.Request.Headers.TryGetValue("Authorization", out var value);
-    await next();
-});
+
+app.UseStaticFiles(); // Cho phép lưu file tĩnh 
+//app.Use(async (context, next) =>
+//{
+//    context.Request.Headers.TryGetValue("Authorization", out var value);
+//    await next();
+//});
 //#22 sự khác biệt giữa việc gọi chuỗi (chaining) các phương thức như : Phải trả về (IEndpointRouteBuilder)
 //#22 và tách thành từng lệnh riêng lẻ như:Có thể trả về (void) hoặc (IEndpointRouteBuilder)
 app.UseAuthentication()
     .UseAuthorization();
-app.UseStaticFiles(); // Cho phép lưu file tĩnh 
+
 
 app.UseAntiforgery(); // ✅ ở đây
 

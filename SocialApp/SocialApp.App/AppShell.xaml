@@ -19,11 +19,12 @@
        Shell.NavBarHasShadow="True">
 
 
-
+    
     <ShellContent Title=""
                   ContentTemplate="{DataTemplate pages:InitPage}"
                   Route="InitPage" />
-
+<ShellContent Route="PostDetailsPage"
+                  ContentTemplate="{DataTemplate pages:PostDetailsPage}" />
     <ShellContent Title="Onboarding"
                   ContentTemplate="{DataTemplate pages:OnboardingPage}"
                   Route="OnboardingPage" />
@@ -53,8 +54,7 @@
 
 
 
-    <ShellContent Route="PostDetailsPage"
-                  ContentTemplate="{DataTemplate pages:PostDetailsPage}" />
+
     <ShellContent Title="post"
                   ContentTemplate="{DataTemplate pages:CreatePostPage}"
                   Route="CreatePostPage" />

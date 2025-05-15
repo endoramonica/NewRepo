@@ -1,6 +1,9 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿    using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Refit;
 using SocialApp.App.Apis;
+using SocialApp.App.Models;
+using SocialApp.App.Pages;
 using SocialAppLibrary.Shared.Dtos;
 using System;
 using System.Collections.Generic;
@@ -12,24 +15,27 @@ using System.Threading.Tasks;
 
 namespace SocialApp.App.ViewModels
 {
-    public partial class HomeViewModels:BaseViewModel
+    public partial class HomeViewModels:PostBaseViewModel
     {
-        private readonly IPostApi _postApi;
-
-        public HomeViewModels(IPostApi postApi) 
+       
+        public HomeViewModels(IPostApi postApi) : base(postApi) 
         {
-           _postApi = postApi;
+          
+            FetchPostAsync();
         }
-        public ObservableCollection<PostDto> Posts { get; set; } = [];
+        public ObservableCollection<PostModel> Posts { get; set; } = [];
+        //public ObservableCollection<PostDto> Posts { get; set; } = new ObservableCollection<PostDto>();
+
         private int _startIndex = 0; 
         private const int PageSize = 10;
+        
 
         [RelayCommand]
         private async Task FetchPostAsync ()
         {
             await MakeApiCall(async () =>
             {
-                var posts = await _postApi.GetPostsAsync(_startIndex, PageSize);
+                var posts = await PostApi.GetPostsAsync(_startIndex, PageSize);
                 if (posts.Length > 0)
                 {
                     if (_startIndex == 0 && Posts.Count > 0)
@@ -39,18 +45,43 @@ namespace SocialApp.App.ViewModels
                         Posts.Clear();
 
                     }
-                    _startIndex = posts.Length;
-                    foreach (var post in posts)
+                    _startIndex += posts.Length;
+                    foreach (var p in posts)
                     {
-                        Posts.Add(post);
+                        Posts.Add(PostModel.FromDto(p));
                     }
 
                 }
+               
 
 
             });
-               
+            
+
         }
+        [ObservableProperty]
+        private bool _isRefreshView;
+        [RelayCommand]
+        private async Task RefreshPostAsync()
+        {
+            try
+            {
+                
+                _startIndex = 0; // Reset the start index to fetch from the beginning
+                await FetchPostAsync(); // Reuse the existing FetchPostAsync method
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"🚨 [RefreshPostAsync] Error during refresh: {ex.Message}");
+                await ShowErrorAlertAsync("Unable to refresh posts.");
+            }
+            finally
+            {
+                IsRefreshView = false; // Reset the refresh state
+            }
+        }
+
+        
         #region Methods
 
         /// <summary>

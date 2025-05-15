@@ -9,6 +9,7 @@ using SocialApp.App.Pages;
 using SocialApp.App.ViewModels;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using SocialApp.App.Controls;
 
 
 namespace SocialApp.App
@@ -38,11 +39,13 @@ namespace SocialApp.App
             builder.Services.AddTransient<LoginViewModel>().AddTransient<LoginPage>();
             builder.Services.AddTransient<RegisterViewModel>().AddTransient<SignUpPage>();
             builder.Services.AddTransient<SavePostViewModel>().AddTransient<CreatePostPage>();
-    
+            builder.Services.AddTransient<DetailsViewModel>().AddTransient<PostDetailsPage>();
+           
+
             builder.Services.AddTransient<InitPage>();
             builder.Services.AddSingleton<IAppPreferences, AppPreferences>();
-            builder.Services.AddSingleton<HomeViewModels>().AddSingleton<HomeViewModels>();
-
+            builder.Services.AddSingleton<HomeViewModels>().AddSingleton<HomePage>();
+           
             ConfigureRefit(builder.Services);
             return builder.Build();
         }

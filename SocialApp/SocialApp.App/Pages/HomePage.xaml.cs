@@ -10,6 +10,7 @@ namespace SocialApp.App.Pages
         {
             InitializeComponent();
             BindingContext = homeViewModels;
+            
         }
 
     }

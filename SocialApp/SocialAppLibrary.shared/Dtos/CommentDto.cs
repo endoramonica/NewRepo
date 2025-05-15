@@ -9,5 +9,6 @@
         public string? UserName { get; set; }
         public string? UserPhotoUrl { get; set; }
         public DateTime AddedOn { get; set; }
+        public string CommentedOnDisplay => AddedOn.ToString("dd MMM yyyy | HH:mm");
     }
 }

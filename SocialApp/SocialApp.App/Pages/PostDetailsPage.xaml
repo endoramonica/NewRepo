@@ -4,295 +4,172 @@
              x:Class="SocialApp.App.Pages.PostDetailsPage"
              Shell.PresentationMode="ModalAnimated"
              xmlns:controls="clr-namespace:SocialApp.App.Controls"
+             xmlns:vm="clr-namespace:SocialApp.App.ViewModels"
+             xmlns:dataTemplates="clr-namespace:SocialApp.App.Templates"
+             xmlns:dtos="clr-namespace:SocialAppLibrary.Shared.Dtos;assembly=SocialAppLibrary.shared"
+             x:DataType="vm:DetailsViewModel"
              Shell.NavBarIsVisible="False"
              Title="Chi tiết bài viết">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="White">
 
-        <!-- Hàng 1: Thanh tiêu đề -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,*,Auto">
-            <Label Grid.Column="0" Text="Cột 1" BackgroundColor="LightBlue" HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Label Grid.Column="1" Text="Cột 2" BackgroundColor="LightGreen" HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Grid Grid.Column="2">
-                <Grid ColumnDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10">
-                    <Image Grid.Column="0" Source="bomb.png" HeightRequest="30" WidthRequest="30" Margin="5"/>
-                    <Image Grid.Column="1" Source="ngoisao.png" HeightRequest="30" WidthRequest="30" Margin="5"/>
-                    <Image Grid.Column="2" Source="delete.png" HeightRequest="30" WidthRequest="30" Margin="5">
-                        <Image.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
-                        </Image.GestureRecognizers>
-                    </Image>
-                    <Image Grid.Column="3" Source="pink_heart.png" HeightRequest="30" WidthRequest="30" Margin="5"/>
-                </Grid>
+        <!-- Header -->
+        <Grid Grid.Row="0" Padding="10" ColumnDefinitions="*,Auto" BackgroundColor="#f5f5f5">
+            <Label Text="{Binding Post.UserName}" 
+                   FontSize="18" 
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+
+            <Grid IsVisible="{Binding IsOwner}" Grid.Column="1" ColumnDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10">
+                <Image Grid.Column="0" Source="bomb.png" HeightRequest="30" WidthRequest="30">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BackHomeCommand }" />
+                    </Image.GestureRecognizers>
+                </Image>
+                <Image Grid.Column="1" Source="ngoisao.png" HeightRequest="30" WidthRequest="30"/>
+                <Image Grid.Column="2" Source="delete.png" HeightRequest="30" WidthRequest="30">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding DeletePostCommand}"
+                            />
+                    </Image.GestureRecognizers>
+                </Image>
+                <Image Grid.Column="3" Source="pink_heart.png" HeightRequest="30" WidthRequest="30"/>
             </Grid>
         </Grid>
 
-        <!-- Hàng 2: Nội dung cuộn -->
+        <!-- Nội dung -->
         <ScrollView Grid.Row="1" VerticalOptions="Fill">
-            <VerticalStackLayout Spacing="10">
-                <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="10">
-                    <Border Grid.Column="0" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="LightGray">
-                        <Image Source="logo.png" WidthRequest="30" HeightRequest="30" Aspect="AspectFit" />
+            <VerticalStackLayout Padding="10" Spacing="12">
+
+                <!-- Thông tin người đăng -->
+                <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="8">
+                    <Border Grid.Column="0"
+                            HeightRequest="40"
+                            WidthRequest="40"                            
+                            StrokeShape="RoundRectangle 20"
+                            BackgroundColor="LightGray">
+                        <Image Source="{Binding Post.UserPhotoUrl}"
+                               WidthRequest="30"
+                               HeightRequest="30"
+                               Aspect="AspectFit"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center" />
                     </Border>
-                    <VerticalStackLayout Grid.Column="1">
-                        <Label FontAttributes="Bold" Text="Abhay Prince" FontSize="14" TextColor="Black" />
-                        <Label FontSize="12" Text="04 Jan 2025" TextColor="Gray" />
+
+                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                        <Label Text="{Binding Post.UserName}" FontAttributes="Bold" FontSize="14"/>
+                        <Label Text="{Binding Post.PostedOnDisplay , StringFormat='{0:dd/MMM/yyyy hh:mm tt}'}"
+                               FontSize="12"
+                               TextColor="Gray"/>
                     </VerticalStackLayout>
-                    <ImageButton Grid.Column="2" Source="more_icon.png" HeightRequest="24" WidthRequest="24" HorizontalOptions="End" />
                 </Grid>
 
-                <!-- Hình ảnh bài viết -->
-                <Border BackgroundColor="LightSalmon" StrokeShape="RoundRectangle 10" Padding="0">
-                    <Image Aspect="AspectFill" HeightRequest="250" Source="bird.png" HorizontalOptions="Fill" />
+                <!-- Hình ảnh -->
+                <Border BackgroundColor="#FFE4B5" StrokeThickness="0">
+                    <Image Source="{Binding Post.PhotoUrl}" 
+                           HeightRequest="250"
+                           Aspect="AspectFill"
+                           HorizontalOptions="Fill" />
                 </Border>
 
                 <!-- Nội dung bài viết -->
-                <Label Text="Some random post text will go here. This is a sample post content to demonstrate how the layout works." 
-                FontSize="14" TextColor="Black" LineBreakMode="WordWrap" Padding="5" />
+                <Label Text="{Binding Post.Content}" 
+                       FontSize="14"
+                       Padding="5"
+                       TextColor="Black"/>
 
-                <!-- Đường kẻ mờ -->
-                <BoxView HeightRequest="1" BackgroundColor="Gray" />
+                <!-- Đường kẻ -->
+                <BoxView HeightRequest="1" BackgroundColor="#dddddd"/>
 
-                <!-- Danh sách bình luận -->
-                <VerticalStackLayout x:Name="comments" Padding="10" Spacing="10">
-                    <!--comment 1 -->
-                    <Border StrokeThickness="1" StrokeShape="RoundRectangle 20" BackgroundColor="WhiteSmoke" Padding="5">
-                        <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="5">
-                            <Border Grid.Column="0" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="LightGray">
-                                <Image Source="logo.png" WidthRequest="30" HeightRequest="30" Aspect="AspectFit" />
-                            </Border>
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label FontAttributes="Bold" Text="Abhay Prince" FontSize="12" TextColor="Black" />
-                                <Label Grid.Row="2" FontSize="18" Text="i love you "  TextColor="Black" />
-                                <Label Grid.Row="0"  FontSize="10" Text="04 Jan 2025" TextColor="Gray" />
+                <!-- Nút hành động -->
+                <controls:PostActionButtons 
+    />
 
-                            </VerticalStackLayout>
-                            <ImageButton Grid.Column="2"
-                             Source="heart.png"
-                             HeightRequest="10"
-                             WidthRequest="10"
-                             Aspect="Fill"
-                             Padding="0"
-                             Scale="0.7"            
-                             Margin="0"
-                             HorizontalOptions="End"
-                             VerticalOptions="Center"/>
 
-                        </Grid>
-                    </Border>
-                    <!--comment 2 -->
-                    <Border StrokeThickness="1" StrokeShape="RoundRectangle 20" BackgroundColor="WhiteSmoke" Padding="5">
-                        <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="5">
-                            <Border Grid.Column="0" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="LightGray">
-                                <Image Source="logo.png" WidthRequest="30" HeightRequest="30" Aspect="AspectFit" />
-                            </Border>
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label FontAttributes="Bold" Text="Abhay Prince" FontSize="12" TextColor="Black" />
-                                <Label Grid.Row="2" FontSize="18" Text="i hate you "  TextColor="Black" />
-                                <Label Grid.Row="0"  FontSize="10" Text="04 Jan 2025" TextColor="Gray" />
-                                
-                            </VerticalStackLayout>
-                            <ImageButton Grid.Column="2"
-                             Source="heart.png"
-                             HeightRequest="10"
-                             WidthRequest="10"
-                             Aspect="Fill"
-                             Padding="0"
-                             Scale="0.7"            
-                             Margin="0"
-                             HorizontalOptions="End"
-                             VerticalOptions="Center"/>
 
-                        </Grid>
-                    </Border>
-                    <!--comment 3-->
-                    <Border StrokeThickness="1" StrokeShape="RoundRectangle 20" BackgroundColor="WhiteSmoke" Padding="5">
-                        <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="5">
-                            <Border Grid.Column="0" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="LightGray">
-                                <Image Source="logo.png" WidthRequest="30" HeightRequest="30" Aspect="AspectFit" />
-                            </Border>
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label FontAttributes="Bold" Text="Abhay Prince" FontSize="12" TextColor="Black" />
-                                <Label Grid.Row="2" FontSize="18" Text="i miss you "  TextColor="Black" />
-                                <Label Grid.Row="0"  FontSize="10" Text="04 Jan 2025" TextColor="Gray" />
 
-                            </VerticalStackLayout>
-                            <ImageButton Grid.Column="2"
-                             Source="heart.png"
-                             HeightRequest="10"
-                             WidthRequest="10"
-                             Aspect="Fill"
-                             Padding="0"
-                             Scale="0.7"            
-                             Margin="0"
-                             HorizontalOptions="End"
-                             VerticalOptions="Center"/>
+                <!-- Bình luận -->
+                
 
-                        </Grid>
-                    </Border>
-                    <!--comment 4-->
-                    <Border StrokeThickness="1" StrokeShape="RoundRectangle 20" BackgroundColor="WhiteSmoke" Padding="5">
-                        <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="5">
-                            <Border Grid.Column="0" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="LightGray">
-                                <Image Source="logo.png" WidthRequest="30" HeightRequest="30" Aspect="AspectFit" />
-                            </Border>
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label FontAttributes="Bold" Text="Abhay Prince" FontSize="12" TextColor="Black" />
-                                <Label Grid.Row="2" FontSize="18" Text="i need you "  TextColor="Black" />
-                                <Label Grid.Row="0"  FontSize="10" Text="04 Jan 2025" TextColor="Gray" />
+                <CollectionView ItemsSource="{Binding Comments}"
+                                EmptyView="Chưa có bình luận nào.">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout ItemSpacing="10" Orientation="Vertical"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="dtos:CommentDto">
+                            <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="8" Padding="5">
+                                <!-- Avatar -->
+                                <Border Grid.Column="0"
+                                        HeightRequest="40"
+                                        WidthRequest="40"
+                                        StrokeShape="RoundRectangle 20"
+                                        BackgroundColor="LightGray">
+                                    <Image Source="{Binding UserPhotoUrl}"
+                                           WidthRequest="30"
+                                           HeightRequest="30"
+                                           Aspect="AspectFit"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center" />
+                                </Border>
 
-                            </VerticalStackLayout>
-                            <ImageButton Grid.Column="2"
-                             Source="heart.png"
-                             HeightRequest="10"
-                             WidthRequest="10"
-                             Aspect="Fill"
-                             Padding="0"
-                             Scale="0.7"            
-                             Margin="0"
-                             HorizontalOptions="End"
-                             VerticalOptions="Center"/>
-
-                        </Grid>
-                    </Border>
-                    <!--comment 5 -->
-                    <Border StrokeThickness="1" StrokeShape="RoundRectangle 20" BackgroundColor="WhiteSmoke" Padding="5">
-                        <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="5">
-                            <Border Grid.Column="0" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="LightGray">
-                                <Image Source="logo.png" WidthRequest="30" HeightRequest="30" Aspect="AspectFit" />
-                            </Border>
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label FontAttributes="Bold" Text="Abhay Prince" FontSize="12" TextColor="Black" />
-                                <Label Grid.Row="2" FontSize="18" Text="i love you "  TextColor="Black" />
-                                <Label Grid.Row="0"  FontSize="10" Text="04 Jan 2025" TextColor="Gray" />
-
-                            </VerticalStackLayout>
-                            <ImageButton Grid.Column="2"
-         Source="heart.png"
-         HeightRequest="10"
-         WidthRequest="10"
-         Aspect="Fill"
-         Padding="0"
-         Scale="0.7"            
-         Margin="0"
-         HorizontalOptions="End"
-         VerticalOptions="Center"/>
-
-                        </Grid>
-                    </Border>
-                    <!--comment 6 -->
-                    <Border StrokeThickness="1" StrokeShape="RoundRectangle 20" BackgroundColor="WhiteSmoke" Padding="5">
-                        <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="5">
-                            <Border Grid.Column="0" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="LightGray">
-                                <Image Source="logo.png" WidthRequest="30" HeightRequest="30" Aspect="AspectFit" />
-                            </Border>
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label FontAttributes="Bold" Text="Abhay Prince" FontSize="12" TextColor="Black" />
-                                <Label Grid.Row="2" FontSize="18" Text="i hate you "  TextColor="Black" />
-                                <Label Grid.Row="0"  FontSize="10" Text="04 Jan 2025" TextColor="Gray" />
-
-                            </VerticalStackLayout>
-                            <ImageButton Grid.Column="2"
-         Source="heart.png"
-         HeightRequest="10"
-         WidthRequest="10"
-         Aspect="Fill"
-         Padding="0"
-         Scale="0.7"            
-         Margin="0"
-         HorizontalOptions="End"
-         VerticalOptions="Center"/>
-
-                        </Grid>
-                    </Border>
-                    <!--comment 7-->
-                    <Border StrokeThickness="1" StrokeShape="RoundRectangle 20" BackgroundColor="WhiteSmoke" Padding="5">
-                        <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="5">
-                            <Border Grid.Column="0" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="LightGray">
-                                <Image Source="logo.png" WidthRequest="30" HeightRequest="30" Aspect="AspectFit" />
-                            </Border>
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label FontAttributes="Bold" Text="Abhay Prince" FontSize="12" TextColor="Black" />
-                                <Label Grid.Row="2" FontSize="18" Text="i miss you "  TextColor="Black" />
-                                <Label Grid.Row="0"  FontSize="10" Text="04 Jan 2025" TextColor="Gray" />
-
-                            </VerticalStackLayout>
-                            <ImageButton Grid.Column="2"
-         Source="heart.png"
-         HeightRequest="10"
-         WidthRequest="10"
-         Aspect="Fill"
-         Padding="0"
-         Scale="0.7"            
-         Margin="0"
-         HorizontalOptions="End"
-         VerticalOptions="Center"/>
-
-                        </Grid>
-                    </Border>
-                    <!--comment 8-->
-                    <Border StrokeThickness="1" StrokeShape="RoundRectangle 20" BackgroundColor="WhiteSmoke" Padding="5">
-                        <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="5">
-                            <Border Grid.Column="0" HeightRequest="40" WidthRequest="40" StrokeShape="RoundRectangle 20" BackgroundColor="LightGray">
-                                <Image Source="logo.png" WidthRequest="30" HeightRequest="30" Aspect="AspectFit" />
-                            </Border>
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label FontAttributes="Bold" Text="Abhay Prince" FontSize="12" TextColor="Black" />
-                                <Label Grid.Row="2" FontSize="18" Text="i need you "  TextColor="Black" />
-                                <Label Grid.Row="0"  FontSize="10" Text="04 Jan 2025" TextColor="Gray" />
-
-                            </VerticalStackLayout>
-                            <ImageButton Grid.Column="2"
-         Source="heart.png"
-         HeightRequest="10"
-         WidthRequest="10"
-         Aspect="Fill"
-         Padding="0"
-         Scale="0.7"            
-         Margin="0"
-         HorizontalOptions="End"
-         VerticalOptions="Center"/>
-
-                        </Grid>
-                    </Border>
-
-                </VerticalStackLayout>
+                                <!-- Nội dung bình luận -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label Text="{Binding UserName}" 
+                                           FontAttributes="Bold" 
+                                           FontSize="13"/>
+                                    <Label Text="{Binding Content}" 
+                                           FontSize="13" 
+                                           TextColor="Black"/>
+                                    <Label Text="{Binding CommentedOnDisplay}" 
+                                           FontSize="11" 
+                                           TextColor="Gray"/>
+                                    
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Hàng 3: Ô nhập bình luận -->
-        <Border Grid.Row="2" StrokeShape="RoundRectangle 10" BackgroundColor="BlanchedAlmond" Padding="10" StrokeThickness="1" Stroke="Gray">
+        <!-- Nhập bình luận -->
+        <Border Grid.Row="2" StrokeShape="RoundRectangle 10" BackgroundColor="#FFF8DC" Padding="10" Stroke="Gray" StrokeThickness="1">
             <VerticalStackLayout>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                    <Border Grid.Column="0" StrokeShape="RoundRectangle 20" BackgroundColor="White" Padding="10">
-                        <Entry Placeholder="Nhập bình luận..." 
-                        x:Name="CommentEntry"  
-                        FontSize="14" 
-                        TextColor="Black" 
-                        PlaceholderColor="Gray" 
-                        Completed="OnCommentSubmitted" 
-                        MaxLength="200" />
+                    <Border Grid.Column="0" StrokeShape="RoundRectangle 20" BackgroundColor="White" Padding="5">
+                        <Entry Placeholder="Nhập bình luận..."
+                               x:Name="CommentEntry"
+                               Text="{Binding CommentContent}"
+                               FontSize="14"
+                               TextColor="Black"
+                               PlaceholderColor="Gray"
+                               MaxLength="200"/>
                     </Border>
-                    <Button Grid.Column="1" 
-                    Text="Gửi" 
-                    BackgroundColor="DodgerBlue" 
-                    TextColor="White" 
-                    FontAttributes="Bold" 
-                    CornerRadius="20" 
-                    Padding="20,10" 
-                    Clicked="OnCommentSubmitted" />
+
+                    <Button Grid.Column="1"
+                            Text="Gửi"
+                            BackgroundColor="DodgerBlue"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            CornerRadius="20"
+                            Padding="20,10"
+                            Command="{Binding AddCommentCommand}"/>
                 </Grid>
 
-                <!-- Hiển thị số ký tự còn lại -->
-                <Label Text="{Binding Source={x:Reference CommentEntry}, Path=Text.Length, StringFormat='{0}/200 ký tự'}" 
-                FontSize="12" 
-                TextColor="Gray" 
-                HorizontalOptions="End" 
-                Margin="0,5,0,0" />
+                <Label Text="{Binding Source={x:Reference CommentEntry}, Path=Text.Length, StringFormat='{0}/200 ký tự'}"
+                       FontSize="12"
+                       TextColor="Gray"
+                       HorizontalOptions="End"
+                       Margin="0,5,0,0"/>
             </VerticalStackLayout>
         </Border>
 
+        <!-- ActivityIndicator -->
+        <ActivityIndicator Grid.RowSpan="3"
+                           IsRunning="{Binding IsBusy}"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"
+                           Color="DodgerBlue"/>
     </Grid>
-
-
 </ContentPage>

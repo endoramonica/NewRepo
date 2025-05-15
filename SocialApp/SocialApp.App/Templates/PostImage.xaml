@@ -2,8 +2,9 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:SocialApp.App.Controls"
-             xmlns:dtos="clr-namespace:SocialAppLibrary.Shared.Dtos;assembly=SocialAppLibrary.shared"
-             x:DataType="dtos:PostDto"
+             x:DataType="models:PostModel"
+             xmlns:vm ="clr-namespace:SocialApp.App.ViewModels"
+             xmlns:models="clr-namespace:SocialApp.App.Models"
              x:Class="SocialApp.App.Templates.PostImage">
 
     <!-- Khung chứa bài viết 2 -->
@@ -24,12 +25,13 @@
                         WidthRequest="40"
                         StrokeShape="RoundRectangle 20"
                         BackgroundColor="Aqua">
-                    <Image Source="{Binding UserPhotoUrl}"
+                    <Image Source="{Binding UserPhotoUrl }"
                            WidthRequest="30"
                            HeightRequest="30"
                            VerticalOptions="Center"
                            HorizontalOptions="Center"
                            Aspect="AspectFit" />
+                    
                 </Border>
 
                 <!-- Thông tin người dùng -->
@@ -40,9 +42,9 @@
                            VerticalOptions="Center" />
 
                     <Label FontSize="12"
-                           Text="{Binding PostedOnDisplay}"
-                           VerticalOptions="Center"
-                           TextColor="Gray" />
+                    Text="{Binding PostedOnDisplay }"
+                    VerticalOptions="Center"
+                    TextColor="Gray" />
                 </VerticalStackLayout>
             </Grid>
 
@@ -55,6 +57,11 @@
                        Source="{Binding PhotoUrl}"
                        HorizontalOptions="Fill"
                        VerticalOptions="Fill" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer 
+                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}},
+                        Path=GoToPostDetailsPageCommand}" CommandParameter="{Binding .}" />
+                </Border.GestureRecognizers>
             </Border>
 
             <!-- Nội dung bài viết -->
@@ -62,7 +69,14 @@
                    Text="{Binding Content}"
                    Padding="10,5"
                    FontSize="14"
-                   TextColor="Black" />
+                   TextColor="Black" >
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer 
+                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}},
+                        Path=GoToPostDetailsPageCommand}" CommandParameter="{Binding .}" >
+                    </TapGestureRecognizer>
+                </Label.GestureRecognizers>
+            </Label>
 
             <!-- Đường kẻ mờ -->
             <BoxView Grid.Row="3"
@@ -70,7 +84,14 @@
 
             <!-- Gọi lại PostActionButtons -->
             <controls:PostActionButtons Grid.Row="4"
-                                        Padding="5" />
+                                    
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Start"
+                            Padding="5" 
+                                       
+                                        />
+
+
 
         </Grid>
 

@@ -108,7 +108,7 @@
             </DataTemplate>
 
             <templates:PostTemplateSelector
-                x:Key=" postDataTemplateSelector"
+                x:Key="postDataTemplateSelector"
                 OnlyImage="{StaticResource postWithOnlyImageTemplate}"
                 WithImage="{StaticResource postWithImageTemplate}"
                 WithNoImage="{StaticResource postWithNoImageTemplate}"

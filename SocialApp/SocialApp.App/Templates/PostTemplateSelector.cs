@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
+using SocialApp.App.Models;
 
 namespace SocialApp.App.Templates
 {
@@ -17,7 +18,7 @@ namespace SocialApp.App.Templates
       
         protected override Microsoft.Maui.Controls.DataTemplate OnSelectTemplate(object item, BindableObject container)
         {
-           if( item is PostDto post )
+           if( item is PostModel post )
             {
                 // only text content 
                 if(string.IsNullOrWhiteSpace(post.PhotoUrl) )
