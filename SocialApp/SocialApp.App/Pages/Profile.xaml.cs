@@ -1,11 +1,14 @@
-﻿namespace SocialApp.App.Pages;
+﻿using SocialApp.App.ViewModels;
+
+namespace SocialApp.App.Pages;
 
 public partial class Profile : ContentPage
 {
-	public Profile()
+	public Profile( ProfileViewModel profileViewModel)
 	{
 		InitializeComponent();
-	}
+        BindingContext = profileViewModel;
+    }
 
     private void ToolbarItem_Clicked(object sender, EventArgs e)
     {
