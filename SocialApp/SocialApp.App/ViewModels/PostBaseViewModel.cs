@@ -2,6 +2,7 @@
 using SocialApp.App.Apis;
 using SocialApp.App.Models;
 using SocialAppLibrary.Shared.Dtos;
+using System.Diagnostics;
 
 namespace SocialApp.App.ViewModels;
 
@@ -49,7 +50,7 @@ public partial class PostBaseViewModel:BaseViewModel
     [RelayCommand]
     private async Task ToggleBookMarkAsync(PostModel post)
     {
-        await MakeApiCall(async () =>
+        await MakeApiCall(async () =>   
         {
             var originalState = post.IsBookmarked;
             var result = await PostApi.ToggleBookmarkAsync(post.PostId); // <-- FIXED
@@ -66,10 +67,12 @@ public partial class PostBaseViewModel:BaseViewModel
     [RelayCommand]
     private async Task SharePostAsync(PostModel post)
     {
+
         string? tempPhotoPath = null;
 
         if (!string.IsNullOrWhiteSpace(post.PhotoUrl))
         {
+           
             tempPhotoPath = await DownloadPhotosAsync(post.PhotoUrl);
             if (string.IsNullOrWhiteSpace(tempPhotoPath))
             {
@@ -140,7 +143,7 @@ public partial class PostBaseViewModel:BaseViewModel
         }
 
     }
-
+    
     public void Depose()
     {
         _httpClient?.Dispose();

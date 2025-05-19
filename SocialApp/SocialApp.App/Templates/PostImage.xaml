@@ -87,13 +87,7 @@ Post="{Binding .}"
 ViewModel="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}}}"
 Padding="5" />
 
-
-
-
-
         </Grid>
-
-        
 
     </Border>
 </ContentView>

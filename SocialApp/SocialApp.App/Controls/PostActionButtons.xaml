@@ -41,6 +41,6 @@
             WidthRequest="30"  
             HeightRequest="30"  
             Command="{Binding Source={x:Reference this}, Path=ViewModel.SharePostCommand}"  
-            CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />    
+            CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />
     </HorizontalStackLayout>
 </ContentView>

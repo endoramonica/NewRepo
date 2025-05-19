@@ -13,4 +13,6 @@ public interface IUserApi
     Task<PostDto[]> GetUserPostsAsync(int startIndex, int pageSize);
     [Get("/api/user/bookmarked-posts")]
     Task<PostDto[]> GetUserBookmarkedPostsAsync(int startIndex, int pageSize);
+    [Get("/api/user/liked-posts")]
+    Task<PostDto[]> GetUserLikedPostsAsync(int startIndex, int pageSize);
 }

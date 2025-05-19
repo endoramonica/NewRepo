@@ -3,330 +3,118 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SocialApp.App.Pages.Profile"
              xmlns:controls="clr-namespace:SocialApp.App.Controls"
+             xmlns:vm="clr-namespace:SocialApp.App.ViewModels"
+             xmlns:converters="clr-namespace:SocialApp.App.Converters"
+             x:DataType="vm:ProfileViewModel"
              BackgroundColor="White"
              Title="Profile">
 
+    <!-- Khai báo tài nguyên Converter -->
+    <ContentPage.Resources>
+        <converters:TabToPostsConverter x:Key="TabToPostsConverter" />
+        <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+    </ContentPage.Resources>
+
+    <!-- ToolbarItems giữ nguyên -->
     <ContentPage.ToolbarItems>
-        <!-- Tiêu đề (Giả lập bằng ToolbarItem có Text) -->
         <ToolbarItem Priority="4" Text="Tiêu đề" />
-        <!-- Biểu tượng đầu tiên (hiển thị đầu tiên bên trái) -->
-        <ToolbarItem IconImageSource="bomb.png" Clicked="ToolbarItem_Clicked" Priority="0" Order="Primary"/>
-
-        <!-- Biểu tượng thứ hai (ở giữa) -->
-        <ToolbarItem IconImageSource="settings.png" Clicked="ToolbarItem_Clicked_1" Priority="1" Order="Primary"/>
-
-        <!-- Biểu tượng thứ ba (ở phải hoặc vào menu nếu không đủ chỗ) -->
-        <ToolbarItem IconImageSource="apple_icon.png" Clicked="ToolbarItem_Clicked_2" Priority="2" Order="Primary"/>
-
-        <!-- Một tùy chọn khác trong menu '...' -->
-        <ToolbarItem Text="Thêm" Clicked="ToolbarItem_Clicked_4" Priority="3" Order="Secondary"/>
+        <ToolbarItem IconImageSource="logout.png" Command="{Binding LogoutCommand}" Priority="0" Order="Primary"/>
+        <ToolbarItem IconImageSource="settings.png" Command="{Binding OpenSettingsCommand}" Priority="1" Order="Primary"/>
+        <ToolbarItem IconImageSource="apple_icon.png" Command="{Binding CustomActionCommand}" Priority="2" Order="Primary"/>
+        <ToolbarItem Text="Thêm" Command="{Binding AdditionalActionCommand}" Priority="3" Order="Secondary"/>
     </ContentPage.ToolbarItems>
 
-
-
-    <ScrollView>
-        <VerticalStackLayout Padding="10">
-            <!-- Thông tin người dùng -->
-            <Grid ColumnDefinitions="*,Auto">
-                <VerticalStackLayout>
-                    <Label Text="Thờ Cúng Hòa An" FontAttributes="Bold" FontSize="20"/>
-                    <HorizontalStackLayout>
-                        <Label Text="thocunghoaan" TextColor="Gray"/>
-                        <Label Text=" threads.net" TextColor="Gray"/>
+    <!-- Sử dụng Grid để xếp chồng ActivityIndicator -->
+    <Grid>
+        <!-- Nội dung chính -->
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="10">
+                <!-- Thông tin người dùng -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout>
+                        <Label Text="{Binding User.DisplayName}" FontAttributes="Bold" FontSize="20"/>
+                        <HorizontalStackLayout>
+                            <Label Text="{Binding User.Email}" TextColor="Gray"/>
+                            <Label Text=" threads.net" TextColor="Gray"/>
+                        </HorizontalStackLayout>
+                        <Label Text="15 người theo dõi" TextColor="Gray" Margin="0,5,0,0"/>
+                    </VerticalStackLayout>
+                    <HorizontalStackLayout Grid.Column="1" HorizontalOptions="End">
+                        <Border WidthRequest="50" HeightRequest="50" StrokeShape="RoundRectangle 45" Stroke="LightGray" Padding="0">
+                            <Image Source="{Binding User.DisplayPhotoUrl}" Aspect="AspectFit"/>
+                        </Border>
+                        <Button Text="Theo dõi" WidthRequest="100" HeightRequest="30" BackgroundColor="Black" TextColor="White" Margin="10,0,0,0"/>
                     </HorizontalStackLayout>
-                    <Label Text="15 người theo dõi" TextColor="Gray" Margin="0,5,0,0"/>
-                </VerticalStackLayout>
+                </Grid>
 
-                <HorizontalStackLayout Grid.Column="1" HorizontalOptions="End">
-                    <Border WidthRequest="50" HeightRequest="50" StrokeShape="RoundRectangle 45" Stroke="LightGray" Padding="0">
-                        <Image Source="paw_print.png" Aspect="AspectFit"/>
-                    </Border>
-                    <Button Text="Theo dõi" WidthRequest="100" HeightRequest="30" BackgroundColor="Black" TextColor="White" Margin="10,0,0,0"/>
+                <!-- Tabs chính -->
+                <HorizontalStackLayout HorizontalOptions="Center" Margin="0,10,0,0">
+                    <Button Text="Thread" WidthRequest="100" HeightRequest="30" BackgroundColor="Transparent" FontAttributes="Bold" TextColor="Black"/>
+                    <Button Text="Thread trả lời" WidthRequest="100" HeightRequest="30" BackgroundColor="Transparent" TextColor="Gray"/>
+                    <Button Text="Bài đăng lại" WidthRequest="100" HeightRequest="30" BackgroundColor="Transparent" TextColor="Gray"/>
                 </HorizontalStackLayout>
-            </Grid>
 
-            <!-- Tabs -->
-            <HorizontalStackLayout HorizontalOptions="Center" Margin="0,10,0,0">
-                <Button Text="Thread" WidthRequest="100" HeightRequest="30" BackgroundColor="Transparent" FontAttributes="Bold" TextColor="Black"/>
-                <Button Text="Thread trả lời" WidthRequest="100" HeightRequest="30" BackgroundColor="Transparent" TextColor="Gray"/>
-                <Button Text="Bài đăng lại" WidthRequest="100" HeightRequest="30" BackgroundColor="Transparent" TextColor="Gray"/>
-            </HorizontalStackLayout>
+                <BoxView Margin="15" HeightRequest="1" BackgroundColor="LightGray" />
 
-            <BoxView HeightRequest="1" BackgroundColor="LightGray" Margin="5"/>
-
-            
-            <!-- Bài đăng -->
-            <VerticalStackLayout Spacing="10">
-                <Border Stroke="LightGray" Padding="10" StrokeShape="RoundRectangle 25">
-                    <VerticalStackLayout>
-                        <!-- Header bài đăng -->
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border WidthRequest="30" HeightRequest="30" StrokeShape="RoundRectangle 25" Stroke="LightGray" Padding="0">
-                                <Image Source="account_circle.png" Aspect="AspectFill"/>
-                            </Border>
-
-                            <VerticalStackLayout Grid.Column="1" Margin="5,0,0,0">
-                                <Label Text="thocunghoaan" FontAttributes="Bold"/>
-                                <Label Text="07/02/2025" TextColor="Gray"/>
-                            </VerticalStackLayout>
-
-                            <Button Grid.Column="2" Text="..." BackgroundColor="Transparent"/>
-                        </Grid>
-
-                        <!-- Nội dung bài đăng -->
-                        <Label Text="Nhìn quả giá không tin được luôn. viral#50k/ con thôi. Cá lóc nướng thơm lừng. Một con nặng hơn 1kg, 1kg1 lại thêm miễn phí ship bán kính 2km."/>
-
-                        <!-- Ảnh bài đăng -->
-                        <CarouselView HeightRequest="240">
-                            <CarouselView.ItemsSource>
-                                <x:Array Type="{x:Type x:String}">
-                                    <x:String>dotnet_bot.png</x:String>
-                                    <x:String>heart.png</x:String>
-                                    <x:String>home.png</x:String>
-                                    <x:String>paw_print.png</x:String>
-                                </x:Array>
-                            </CarouselView.ItemsSource>
-                            <CarouselView.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Margin="2"
-                                            Stroke="Grey"
-                                            StrokeShape="RoundRectangle 20"
-                                            StrokeThickness="2"
-                                            Padding="5">
-                                        
-                                        <Image Source="{Binding}"
-                                               Aspect="AspectFill"
-                                               WidthRequest="200"
-                                               HeightRequest="200"
-                                               HorizontalOptions="Fill"
-                                               VerticalOptions="Fill"/>
-                                    </Border>
-                                </DataTemplate>
-                            </CarouselView.ItemTemplate>
-                            <CarouselView.ItemsLayout>
-                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"/>
-                            </CarouselView.ItemsLayout>
-                        </CarouselView>
-
-                        <!-- Gọi lại PostActionButtons -->
-                        <controls:PostActionButtons Padding="5"/>
-
-                        <!-- Hành động -->
-                        <HorizontalStackLayout Margin="0,10,0,0" Spacing="20">
-                            <Button Text="Like" BackgroundColor="Pink"/>
-                            <Button Text="Comment" BackgroundColor="Pink"/>
-                            <Button Text="Repost" BackgroundColor="Pink"/>
-                            <Button Text="Share" BackgroundColor="Pink"/>
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
+                <!-- Sub Tabs -->
+                <Border HeightRequest="30" Stroke="{StaticResource Primary}" StrokeShape="RoundRectangle 15" StrokeThickness="0.5">
+                    <Grid ColumnDefinitions="*,*,*">
+                        <!-- My Posts Tab -->
+                        <Border Grid.Column="0" BackgroundColor="{Binding IsMyPostTabSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter=Background}">
+                            <Label x:Name="myPostLabel" HorizontalOptions="Center" Text="My Posts" TextColor="{Binding IsMyPostTabSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter=Text}" VerticalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectMyPostTabCommand}"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                        <!-- Bookmarked Tab -->
+                        <Border Grid.Column="1" BackgroundColor="{Binding IsBookMarkedTabSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter=Background}">
+                            <Label x:Name="bookmarkedLabel" HorizontalOptions="Center" Text="Bookmarked" TextColor="{Binding IsBookMarkedTabSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter=Text}" VerticalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectBookMarkedPostsTabCommand}"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                        <!-- Liked Tab -->
+                        <Border Grid.Column="2" BackgroundColor="{Binding IsLikedTabSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter=Background}">
+                            <Label x:Name="likedLabel" HorizontalOptions="Center" Text="Liked" TextColor="{Binding IsLikedTabSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter=Text}" VerticalOptions="Center"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectLikedPostsTabCommand}"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
                 </Border>
+
+                <!-- Danh sách bài viết -->
+                <!-- My Posts -->
+                <CollectionView IsVisible="{Binding IsMyPostTabSelected}"
+                    ItemsSource="{Binding MyPosts}"
+                    ItemTemplate="{StaticResource postDataTemplateSelector}"
+                    RemainingItemsThreshold="2"
+                    RemainingItemsThresholdReachedCommand="{Binding FetchMyPostsCommand}" />
+
+                <!-- Bookmarked -->
+                <CollectionView IsVisible="{Binding IsBookMarkedTabSelected}"
+                    ItemsSource="{Binding BookMarkedPost}"
+                    ItemTemplate="{StaticResource postDataTemplateSelector}"
+                    RemainingItemsThreshold="2"
+                    RemainingItemsThresholdReachedCommand="{Binding FetchBookmarkedPostCommand}" />
+
+                <!-- Liked -->
+                <CollectionView IsVisible="{Binding IsLikedTabSelected}"
+                    ItemsSource="{Binding LikedPosts}"
+                    ItemTemplate="{StaticResource postDataTemplateSelector}"
+                    RemainingItemsThreshold="2"
+                    RemainingItemsThresholdReachedCommand="{Binding FetchLikedPostsCommand}" />
             </VerticalStackLayout>
+        </ScrollView>
 
-            <!-- Bài đăng 2 -->
-            <VerticalStackLayout Spacing="10" Margin="0,10,0,0" >
-                <Border Stroke="LightGray" Padding="10" StrokeShape="RoundRectangle 25">
-                    <VerticalStackLayout>
-                        <!-- Header bài đăng -->
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border WidthRequest="30" HeightRequest="30" StrokeShape="RoundRectangle 25" Stroke="LightGray" Padding="0">
-                                <Image Source="account_circle.png" Aspect="AspectFill"/>
-                            </Border>
-
-                            <VerticalStackLayout Grid.Column="1" Margin="5,0,0,0">
-                                <Label Text="thocunghoaan" FontAttributes="Bold"/>
-                                <Label Text="07/02/2025" TextColor="Gray"/>
-                            </VerticalStackLayout>
-
-                            <Button Grid.Column="2" Text="..." BackgroundColor="Transparent"/>
-                        </Grid>
-
-                        <!-- Nội dung bài đăng -->
-                        <Label Text="Nhìn quả giá không tin được luôn. viral#50k/ con thôi. Cá lóc nướng thơm lừng. Một con nặng hơn 1kg, 1kg1 lại thêm miễn phí ship bán kính 2km."/>
-
-                        <!-- Ảnh bài đăng -->
-                        <CarouselView HeightRequest="240">
-                            <CarouselView.ItemsSource>
-                                <x:Array Type="{x:Type x:String}">
-                                    <x:String>dotnet_bot.png</x:String>
-                                    <x:String>heart.png</x:String>
-                                    <x:String>home.png</x:String>
-                                    <x:String>paw_print.png</x:String>
-                                </x:Array>
-                            </CarouselView.ItemsSource>
-                            <CarouselView.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Margin="2"
-                                 Stroke="Grey"
-                                 StrokeShape="RoundRectangle 20"
-                                 StrokeThickness="2"
-                                 Padding="10">
-
-                                        <Image Source="{Binding}"
-                                    Aspect="AspectFill"
-                                    WidthRequest="200"
-                                    HeightRequest="200"
-                                    HorizontalOptions="Fill"
-                                    VerticalOptions="Fill"/>
-                                    </Border>
-                                </DataTemplate>
-                            </CarouselView.ItemTemplate>
-                            <CarouselView.ItemsLayout>
-                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"/>
-                            </CarouselView.ItemsLayout>
-                        </CarouselView>
-
-                        <!-- Gọi lại PostActionButtons -->
-                        <controls:PostActionButtons Padding="5"/>
-
-                        <!-- Hành động -->
-                        <HorizontalStackLayout Margin="0,10,0,0" Spacing="20">
-                            <Button Text="Like" BackgroundColor="Pink"/>
-                            <Button Text="Comment" BackgroundColor="Pink"/>
-                            <Button Text="Repost" BackgroundColor="Pink"/>
-                            <Button Text="Share" BackgroundColor="Pink"/>
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
-            </VerticalStackLayout>
-
-            <!-- Bài đăng 3 -->
-            <VerticalStackLayout Spacing="10" Margin="0,10,0,0" >
-                <Border Stroke="LightGray" Padding="10" StrokeShape="RoundRectangle 25">
-                    <VerticalStackLayout>
-                        <!-- Header bài đăng -->
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border WidthRequest="30" HeightRequest="30" StrokeShape="RoundRectangle 25" Stroke="LightGray" Padding="0">
-                                <Image Source="account_circle.png" Aspect="AspectFill"/>
-                            </Border>
-
-                            <VerticalStackLayout Grid.Column="1" Margin="5,0,0,0">
-                                <Label Text="thocunghoaan" FontAttributes="Bold"/>
-                                <Label Text="07/02/2025" TextColor="Gray"/>
-                            </VerticalStackLayout>
-
-                            <Button Grid.Column="2" Text="..." BackgroundColor="Transparent"/>
-                        </Grid>
-
-                        <!-- Nội dung bài đăng -->
-                        <Label Text="Nhìn quả giá không tin được luôn. viral#50k/ con thôi. Cá lóc nướng thơm lừng. Một con nặng hơn 1kg, 1kg1 lại thêm miễn phí ship bán kính 2km."/>
-
-                        <!-- Ảnh bài đăng -->
-                        <CarouselView HeightRequest="240">
-                            <CarouselView.ItemsSource>
-                                <x:Array Type="{x:Type x:String}">
-                                    <x:String>dotnet_bot.png</x:String>
-                                    <x:String>heart.png</x:String>
-                                    <x:String>home.png</x:String>
-                                    <x:String>paw_print.png</x:String>
-                                </x:Array>
-                            </CarouselView.ItemsSource>
-                            <CarouselView.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Margin="2"
-                      Stroke="Grey"
-                      StrokeShape="RoundRectangle 20"
-                      StrokeThickness="2"
-                      Padding="10">
-
-                                        <Image Source="{Binding}"
-                         Aspect="AspectFill"
-                         WidthRequest="200"
-                         HeightRequest="200"
-                         HorizontalOptions="Fill"
-                         VerticalOptions="Fill"/>
-                                    </Border>
-                                </DataTemplate>
-                            </CarouselView.ItemTemplate>
-                            <CarouselView.ItemsLayout>
-                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"/>
-                            </CarouselView.ItemsLayout>
-                        </CarouselView>
-
-                        <!-- Gọi lại PostActionButtons -->
-                        <controls:PostActionButtons Padding="5"/>
-
-                        <!-- Hành động -->
-                        <HorizontalStackLayout Margin="0,10,0,0" Spacing="20">
-                            <Button Text="Like" BackgroundColor="Pink"/>
-                            <Button Text="Comment" BackgroundColor="Pink"/>
-                            <Button Text="Repost" BackgroundColor="Pink"/>
-                            <Button Text="Share" BackgroundColor="Pink"/>
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
-            </VerticalStackLayout>
-
-            <!-- Bài đăng 4 -->
-            <VerticalStackLayout Spacing="10" Margin="0,10,0,0" >
-                <Border Stroke="LightGray" Padding="10" StrokeShape="RoundRectangle 25">
-                    <VerticalStackLayout>
-                        <!-- Header bài đăng -->
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border WidthRequest="30" HeightRequest="30" StrokeShape="RoundRectangle 25" Stroke="LightGray" Padding="0">
-                                <Image Source="account_circle.png" Aspect="AspectFill"/>
-                            </Border>
-
-                            <VerticalStackLayout Grid.Column="1" Margin="5,0,0,0">
-                                <Label Text="thocunghoaan" FontAttributes="Bold"/>
-                                <Label Text="07/02/2025" TextColor="Gray"/>
-                            </VerticalStackLayout>
-
-                            <Button Grid.Column="2" Text="..." BackgroundColor="Transparent"/>
-                        </Grid>
-
-                        <!-- Nội dung bài đăng -->
-                        <Label Text="Nhìn quả giá không tin được luôn. viral#50k/ con thôi. Cá lóc nướng thơm lừng. Một con nặng hơn 1kg, 1kg1 lại thêm miễn phí ship bán kính 2km."/>
-
-                        <!-- Ảnh bài đăng -->
-                        <CarouselView HeightRequest="240">
-                            <CarouselView.ItemsSource>
-                                <x:Array Type="{x:Type x:String}">
-                                    <x:String>dotnet_bot.png</x:String>
-                                    <x:String>heart.png</x:String>
-                                    <x:String>home.png</x:String>
-                                    <x:String>paw_print.png</x:String>
-                                </x:Array>
-                            </CarouselView.ItemsSource>
-                            <CarouselView.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Margin="2"
-                      Stroke="Grey"
-                      StrokeShape="RoundRectangle 20"
-                      StrokeThickness="2"
-                      Padding="10">
-
-                                        <Image Source="{Binding}"
-                         Aspect="AspectFill"
-                         WidthRequest="200"
-                         HeightRequest="200"
-                         HorizontalOptions="Fill"
-                         VerticalOptions="Fill"/>
-                                    </Border>
-                                </DataTemplate>
-                            </CarouselView.ItemTemplate>
-                            <CarouselView.ItemsLayout>
-                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"/>
-                            </CarouselView.ItemsLayout>
-                        </CarouselView>
-
-                        <!-- Gọi lại PostActionButtons -->
-                        <controls:PostActionButtons Padding="5"/>
-
-                        <!-- Hành động -->
-                        <HorizontalStackLayout Margin="0,10,0,0" Spacing="20">
-                            <Button Text="Like" BackgroundColor="Pink"/>
-                            <Button Text="Comment" BackgroundColor="Pink"/>
-                            <Button Text="Repost" BackgroundColor="Pink"/>
-                            <Button Text="Share" BackgroundColor="Pink"/>
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
-            </VerticalStackLayout>
-
-
-
-
-
-        </VerticalStackLayout>
-    </ScrollView>
+        <!-- ActivityIndicator với lớp phủ -->
+        <Grid IsVisible="{Binding IsBusy}" BackgroundColor="#80000000" Grid.Row="0">
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                              Color="White"
+                              VerticalOptions="Center"
+                              HorizontalOptions="Center"
+                              WidthRequest="50"
+                              HeightRequest="50"/>
+        </Grid>
+    </Grid>
 </ContentPage>

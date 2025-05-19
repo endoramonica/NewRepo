@@ -5,7 +5,7 @@
              Shell.PresentationMode="ModalAnimated"
              xmlns:controls="clr-namespace:SocialApp.App.Controls"
              xmlns:vm="clr-namespace:SocialApp.App.ViewModels"
-             xmlns:dataTemplates="clr-namespace:SocialApp.App.Templates"
+             xmlns:templates="clr-namespace:SocialApp.App.Templates"
              xmlns:dtos="clr-namespace:SocialAppLibrary.Shared.Dtos;assembly=SocialAppLibrary.shared"
              x:DataType="vm:DetailsViewModel"
              Shell.NavBarIsVisible="False"
@@ -39,7 +39,8 @@
 
         <!-- Nội dung -->
         <ScrollView Grid.Row="1" VerticalOptions="Fill">
-            <VerticalStackLayout Padding="10" Spacing="12">
+            <Grid RowDefinitions="Auto,*" RowSpacing="10">
+            
 
                 <!-- Thông tin người đăng -->
                 <Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="8">
@@ -64,7 +65,7 @@
                     </VerticalStackLayout>
                 </Grid>
 
-                <!-- Hình ảnh -->
+                <!-- Hình ảnh 
                 <Border BackgroundColor="#FFE4B5" StrokeThickness="0">
                     <Image Source="{Binding Post.PhotoUrl}" 
                            HeightRequest="250"
@@ -72,28 +73,50 @@
                            HorizontalOptions="Fill" />
                 </Border>
 
-                <!-- Nội dung bài viết -->
+                 Nội dung bài viết 
                 <Label Text="{Binding Post.Content}" 
                        FontSize="14"
                        Padding="5"
                        TextColor="Black"/>
 
-                <!-- Đường kẻ -->
-                <BoxView HeightRequest="1" BackgroundColor="#dddddd"/>
+                 Đường kẻ 
+                <BoxView HeightRequest="1" BackgroundColor="#dddddd"/>-->
 
                 <!-- Nút hành động -->
-                <controls:PostActionButtons Grid.Row="4"
-                                Post="{Binding Post}"
-                                ViewModel="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}}}"
-                                Padding="5" />
+                <ContentView Grid.Row="0" BindingContext="{Binding Post}">
+                    <ContentView.Resources>
+                        <ControlTemplate x:Key="withImage">
+                            <templates:PostImage />
+                        </ControlTemplate>
+                        <ControlTemplate x:Key="withNoImage">
+                            <templates:PostNoImage />
+                        </ControlTemplate>
+                        <ControlTemplate x:Key="onlyImage">
+                            <templates:PostOnlyImage />
+                        </ControlTemplate>
+                    </ContentView.Resources>
 
+                    <ContentView ControlTemplate="{StaticResource withImage}">
+                        <ContentView.Triggers>
+                            <DataTrigger TargetType="ContentView" Binding="{Binding PostTemplateContentViewName}" Value="WithNoImage">
+                                <Setter Property="ControlTemplate" Value="{StaticResource withNoImage}"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="ContentView" Binding="{Binding PostTemplateContentViewName}" Value="OnlyImage">
+                                <Setter Property="ControlTemplate" Value="{StaticResource onlyImage}"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="ContentView" Binding="{Binding PostTemplateContentViewName}" Value="WithImage">
+                                <Setter Property="ControlTemplate" Value="{StaticResource withImage}"/>
+                            </DataTrigger>
+                        </ContentView.Triggers>
+                    </ContentView>
+                </ContentView>
 
+           
 
-
-                <!-- Bình luận -->
+            <!-- Bình luận -->
                 
 
-                <CollectionView ItemsSource="{Binding Comments}"
+                <CollectionView Grid.Row="1" ItemsSource="{Binding Comments}"
                                 EmptyView="Chưa có bình luận nào.">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout ItemSpacing="10" Orientation="Vertical"/>
@@ -132,10 +155,12 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-            </VerticalStackLayout>
+           
+            </Grid>
         </ScrollView>
+   
 
-        <!-- Nhập bình luận -->
+    <!-- Nhập bình luận -->
         <Border Grid.Row="2" StrokeShape="RoundRectangle 10" BackgroundColor="#FFF8DC" Padding="10" Stroke="Gray" StrokeThickness="1">
             <VerticalStackLayout>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">

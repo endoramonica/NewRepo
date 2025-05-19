@@ -1,43 +1,23 @@
-﻿using SocialApp.App.ViewModels;
+﻿
+using SocialApp.App.ViewModels;
 
 namespace SocialApp.App.Pages;
 
 public partial class Profile : ContentPage
 {
-	public Profile( ProfileViewModel profileViewModel)
+    private readonly ProfileViewModel _viewModel;
+    public Profile( ProfileViewModel profileViewModel)
 	{
 		InitializeComponent();
-        BindingContext = profileViewModel;
+        _viewModel = profileViewModel;
+        BindingContext = _viewModel;
     }
-
-    private void ToolbarItem_Clicked(object sender, EventArgs e)
-    {
-
-    }
-
-    private void ToolbarItem_Clicked_1(object sender, EventArgs e)
-    {
-
-    }
-
-    private void ToolbarItem_Clicked_2(object sender, EventArgs e)
-    {
-
-    }
-
-    private void ToolbarItem_Clicked_3(object sender, EventArgs e)
-    {
-
-    }
-
-    private async void ToolbarItem_Clicked_4(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("//HomePage");
-    }
+  
+    
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
+        await _viewModel.FetchMyPostsCommand.ExecuteAsync(null); // Gọi trực tiếp phương thức
         this.TranslationY = 800; // Đặt trang bên ngoài màn hình
         this.Opacity = 0;
 

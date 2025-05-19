@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:SocialApp.App"
              xmlns:templates="clr-namespace:SocialApp.App.Templates"
+             xmlns:converters="clr-namespace:SocialApp.App.Converters"
              x:Class="SocialApp.App.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -113,8 +114,9 @@
                 WithImage="{StaticResource postWithImageTemplate}"
                 WithNoImage="{StaticResource postWithNoImageTemplate}"
                 />
-            
-            
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+            <converters:TabToPostsConverter x:Key="TabToPostsConverter" />
+
         </ResourceDictionary>
     </Application.Resources>
     
