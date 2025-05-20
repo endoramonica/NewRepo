@@ -5,72 +5,99 @@ using SocialApp.App.Apis;
 using SocialApp.App.Pages;
 using System.Diagnostics;
 using System.Text.Json;
+using Refit;
 namespace SocialApp.App.ViewModels;
-
+[QueryProperty(nameof(CropPhotoSource), "new-src")]
 public partial class RegisterViewModel : BaseViewModel
-    {
-        private readonly IAuthApi _authApi;
+{
+    private readonly IAuthApi _authApi;
 
-        public RegisterViewModel(IAuthApi authApi)
+    public RegisterViewModel(IAuthApi authApi)
+    {
+        _authApi = authApi;
+    }
+
+    [ObservableProperty]
+    private string _name;
+
+    [ObservableProperty]
+    private string _email;
+
+    [ObservableProperty]
+    private string _password;
+
+    [RelayCommand]
+   
+    private async Task RegisterAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
-            _authApi = authApi;
+            await ToastAsync("Vui lòng nhập đầy đủ thông tin");
+            return;
         }
 
-        [ObservableProperty]
-        private string _name;
-
-        [ObservableProperty]
-        private string _email;
-
-        [ObservableProperty]
-        private string _password;
-
-        [RelayCommand]
-        private async Task RegisterAsync()
+        await MakeApiCall(async () =>
         {
-            if (IsBusy) return;
+            var registerDto = new RegisterDto(Name, Email, Password);
+            var result = await _authApi.RegisterAsync(registerDto);
 
-            try
+            if (!result.IsSuccess)
             {
-                IsBusy = true;
-                Debug.WriteLine("=== Bắt đầu quá trình đăng ký ===");
-                Debug.WriteLine($"Email: {Email}");
-                Debug.WriteLine($"Name: {Name}");
-                
-                // Trước khi gọi API
-                Debug.WriteLine("Chuẩn bị gọi API đăng ký...");
-                
-                var result = await _authApi.RegisterAsync(new RegisterDto(Name, Email, Password));
+                await ShowErrorAlertAsync(result.Error);
+                return;
+            }
 
-                Debug.WriteLine("Kết quả từ API: " + JsonSerializer.Serialize(result));
+            var userId = result.Data; // Hoặc result.Data.Id nếu là UserDto
 
-                if (result != null)
+            if (!string.IsNullOrWhiteSpace(PhotoImageSource) && PhotoImageSource != "account_circle.png")
+            {
+                var photoName = Path.GetFileName(PhotoImageSource);
+                using var fs = File.OpenRead(PhotoImageSource);
+                var photoStreamPart = new StreamPart(fs, photoName);
+
+                var apiResult = await _authApi.UploadPhotoAsync(userId, photoStreamPart);
+                if (!result.IsSuccess)
                 {
-                    // Xử lý kết quả thành công
-                    Debug.WriteLine("Đăng ký thành công!");
-                     await ShowErrorAlertAsync(result.Error ?? "Đăng ký tài khoản thành công!");
-
-   
-                    await NavigationAsync("//loginPage");
+                   
+                    await ToastAsync("Đã xảy ra lỗi trong quá trình tải ảnh lên");
+                    return;
                 }
+
+                await ToastAsync("Tải ảnh lên thành công");
             }
-            catch (HttpRequestException ex)
-            {
-                Debug.WriteLine($"Lỗi HTTP: {ex.Message}");
-                Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
-                await ToastAsync( "Không thể kết nối đến server");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Lỗi không xác định: {ex.Message}");
-                Debug.WriteLine($"Stack Trace: {ex.StackTrace}");
-                await ToastAsync( "Đã xảy ra lỗi trong quá trình đăng ký");
-            }
-            finally
-            {
-                IsBusy = false;
-                Debug.WriteLine("=== Kết thúc quá trình đăng ký ===");
-            }
+
+            await ToastAsync("Đăng ký thành công");
+            await NavigationAsync("//loginPage");
+        });
+    }
+
+
+    [ObservableProperty]
+    private string _photoImageSource;
+    [ObservableProperty]
+    private string? _cropPhotoSource = "account_circle.png";
+
+    async partial void OnCropPhotoSourceChanged(string? oldValue, string? newValue)
+    {
+        if (!string.IsNullOrWhiteSpace(newValue))
+        {
+            PhotoImageSource = newValue;
+
+
         }
     }
 
+    [RelayCommand]
+    private async Task ChangePhotoAsync()
+    {
+        var selectedPhotoSource = await ChoosePhotoAsync();
+        if (!string.IsNullOrWhiteSpace(selectedPhotoSource))
+        {
+            var param = new Dictionary<string, object>
+            {
+                [nameof(CropImagePage.PhotoSource)] = selectedPhotoSource
+            };
+            await Shell.Current.GoToAsync("//CropImagePage", param);
+        }
+    }
+}

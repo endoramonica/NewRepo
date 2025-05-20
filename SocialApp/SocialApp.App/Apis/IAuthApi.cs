@@ -13,7 +13,7 @@ public interface IAuthApi
 {
     [Multipart]
     [Post("/api/auth/register/{userId}/upload-photo")]
-    Task<ApiResult<string>> UploadPhotoAsync(Guid userId, IFormFile photo);
+    Task<ApiResult<string>> UploadPhotoAsync(Guid userId, StreamPart photo);
     [Post("/api/auth/register")]
     Task<ApiResult<Guid>> RegisterAsync(RegisterDto dto);
     [Post("/api/auth/login")]

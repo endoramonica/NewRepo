@@ -30,7 +30,7 @@
                 <StackLayout Orientation="Horizontal"
                              HorizontalOptions="Center"
                              Margin="0,10">
-                    <Image Source="default_profile.png"
+                    <Image Source="{Binding PhotoImageSource}"
                            HeightRequest="60"
                            WidthRequest="60"
                            VerticalOptions="Center" />
@@ -41,6 +41,7 @@
                             Padding="10,5"
                             Margin="10,0,0,0"
                             HorizontalOptions="Center"
+                            Command="{Binding ChangePhotoCommand}"
                             WidthRequest="130" />
                 </StackLayout>
 
