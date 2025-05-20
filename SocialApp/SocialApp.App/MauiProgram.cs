@@ -10,6 +10,7 @@ using SocialApp.App.ViewModels;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using SocialApp.App.Controls;
+using Syncfusion.Maui.Core.Hosting;
 
 
 namespace SocialApp.App
@@ -22,6 +23,7 @@ namespace SocialApp.App
             builder
                 .UseMauiCommunityToolkit() // Đảm bảo Toolkit được sử dụng
                 .UseMauiApp<App>()
+                .ConfigureSyncfusionCore() // Đảm bảo Syncfusion được sử dụng
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

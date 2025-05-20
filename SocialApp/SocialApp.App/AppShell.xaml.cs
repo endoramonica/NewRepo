@@ -21,7 +21,8 @@ namespace SocialApp.App
             Routing.RegisterRoute(nameof(CreatePostPage), typeof(CreatePostPage));
             Routing.RegisterRoute(nameof(HomePage), typeof(HomePage));
             Routing.RegisterRoute(nameof(Profile), typeof(Profile));
-            
+            Routing.RegisterRoute(nameof(CropImagePage), typeof(CropImagePage));
+
 
         }
     }

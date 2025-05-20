@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:imageEditor="clr-namespace:Syncfusion.Maui.ImageEditor;assembly=Syncfusion.Maui.ImageEditor"
+             x:Class="SocialApp.App.Pages.CropImagePage"
+             Shell.NavBarIsVisible="False"
+             Padding="15"
+             Title="CropImagePage">
+    <Grid RowDefinitions="Auto , *">
+        <imageEditor:SfImageEditor 
+                          x:Name="imageEditor"
+                          ShowToolbar="False"
+                          HeightRequest="400"
+                          WidthRequest="400"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center"/>
+        <Grid Grid.Row="1" ColumnDefinitions="auto,*,auto">
+                <Button Grid.Column="0" Text="Cancel" HorizontalOptions="Center" VerticalOptions="Center" Clicked="Cancel_Click"/>
+                <Button Grid.Column="2" Text="Accepts" HorizontalOptions="Center" VerticalOptions="Center" Clicked="AcceptChanges_Click"/>
+            </Grid>
+    </Grid>
+</ContentPage>

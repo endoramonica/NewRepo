@@ -37,109 +37,11 @@ namespace SocialApp.App.ViewModels
         [RelayCommand]
         private async Task SelectPhotoAsync()
         {
-            if (!MediaPicker.Default.IsCaptureSupported)
+            var selectedPhotoSource = await ChoosePhotoAsync();
+            if(!string.IsNullOrWhiteSpace(selectedPhotoSource))
             {
-                await ShowErrorAlertAsync( "Thiết bị không hỗ trợ chọn ảnh.");
-                return;
+               PhotoPath = selectedPhotoSource;
             }
-
-            const string PickFromDevice = "Chọn từ thiết bị";
-            const string CapturePhoto = "Chụp ảnh";
-
-            var result = await Shell.Current.DisplayActionSheet(
-                "Chọn ảnh",
-                "Hủy",
-                null,
-                PickFromDevice,
-                CapturePhoto);
-
-            if (string.IsNullOrWhiteSpace(result))
-                return;
-
-            switch (result)
-            {
-                case PickFromDevice:
-                    await PickPhotoFromDeviceAsync();
-                    break;
-
-                case CapturePhoto:
-                    await CapturePhotoAsync();
-                    break;
-
-                default:
-                    // Người dùng chọn "Hủy" hoặc đóng prompt
-                    break;
-            }
-
-
-            async Task PickPhotoFromDeviceAsync()
-            {
-                try
-                {
-                    FileResult? fileResult = await MediaPicker.Default.PickPhotoAsync(new MediaPickerOptions
-                    {
-                        Title = "Select photos"
-                    });
-
-                    if (fileResult is null)
-                    {
-                        await ToastAsync("no photo selected");
-                        return;
-                    }// Lưu đường dẫn của ảnh đã chọn
-                    PhotoPath = fileResult.FullPath;
-                }
-                catch (Exception ex)
-                {
-                    await ShowErrorAlertAsync( $"Không thể chọn ảnh: {ex.Message}");
-                }
-
-            }
-
-            async Task CapturePhotoAsync()
-            {
-                try
-                {
-                    // Yêu cầu quyền camera và lưu trữ
-                    var cameraPermissionStatus = await Permissions.CheckStatusAsync<Permissions.Camera>();
-                    if (cameraPermissionStatus != PermissionStatus.Granted)
-                    {
-                        cameraPermissionStatus = await Permissions.RequestAsync<Permissions.Camera>();
-                    }
-
-                    var storagePermissionStatus = await Permissions.CheckStatusAsync<Permissions.StorageRead>();
-                    if (storagePermissionStatus != PermissionStatus.Granted)
-                    {
-                        storagePermissionStatus = await Permissions.RequestAsync<Permissions.StorageRead>();
-                    }
-
-                    // Nếu quyền bị từ chối, thông báo cho người dùng
-                    if (cameraPermissionStatus == PermissionStatus.Denied || storagePermissionStatus == PermissionStatus.Denied)
-                    {
-                        await ShowErrorAlertAsync("You can enable permissions in the app settings.");
-                        return; // Dừng lại nếu quyền bị từ chối
-                    }
-
-                    // Chụp ảnh
-                    FileResult? photo = await MediaPicker.Default.CapturePhotoAsync(new MediaPickerOptions
-                    {
-                        Title = "Chụp ảnh"
-                    });
-
-                    if (photo is null)
-                    {
-                        await ShowErrorAlertAsync("Không có ảnh nào được chụp");
-                        return;
-                    }
-
-                    // Lưu đường dẫn của ảnh đã chụp
-                    PhotoPath = photo.FullPath;
-                }
-                catch (Exception ex)
-                {
-                    await ShowErrorAlertAsync($"Không thể chụp ảnh: {ex.Message}");
-                }
-            }
-
         }
 
 

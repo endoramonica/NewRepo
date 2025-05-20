@@ -73,6 +73,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.3" />
 		<PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
 		<PackageReference Include="SkiaSharp" Version="3.116.1" />
+		<PackageReference Include="Syncfusion.Maui.ImageEditor" Version="29.2.4" />
 	</ItemGroup>
 	<ItemGroup>
 		
@@ -81,6 +82,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Controls\PostActionButtons.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\CropImagePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Templates\PostImage.xaml">

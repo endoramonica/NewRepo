@@ -14,7 +14,9 @@ namespace SocialApp.App.Models
         public Guid PostId { get; set; }
         public Guid UserId { get; set; }
         public string? UserName { get; set; }
-        public string? UserPhotoUrl { get; set; }
+        [ObservableProperty ,NotifyPropertyChangedFor(nameof(UserPhoto))]
+        private string? _userPhotoUrl;
+        public string UserPhoto => string.IsNullOrWhiteSpace(UserPhotoUrl) ? "add_a_photo.png" : UserPhotoUrl;
         public string? Content { get; set; }
         public string? PhotoUrl { get; set; }
         public DateTime PostedOn { get; set; }

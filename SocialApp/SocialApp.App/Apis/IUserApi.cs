@@ -7,8 +7,9 @@ namespace SocialApp.App.Apis;
 [Headers("Authorization: Bearer ")]
 public interface IUserApi
 {
+    [Multipart]
     [Post("/api/user/change-photo")]
-    Task<ApiResult<string>> ChangePhotoAsync(IFormFile photo);
+    Task<ApiResult<string>> ChangePhotoAsync(StreamPart photo);
     [Get("/api/user/posts")]
     Task<PostDto[]> GetUserPostsAsync(int startIndex, int pageSize);
     [Get("/api/user/bookmarked-posts")]

@@ -40,9 +40,26 @@
                         <Label Text="15 người theo dõi" TextColor="Gray" Margin="0,5,0,0"/>
                     </VerticalStackLayout>
                     <HorizontalStackLayout Grid.Column="1" HorizontalOptions="End">
-                        <Border WidthRequest="50" HeightRequest="50" StrokeShape="RoundRectangle 45" Stroke="LightGray" Padding="0">
-                            <Image Source="{Binding User.DisplayPhotoUrl}" Aspect="AspectFit"/>
-                        </Border>
+                        <Grid WidthRequest="50" HeightRequest="50">
+                            <!-- Border chứa ảnh -->
+                            <Border StrokeShape="RoundRectangle 45" Stroke="LightGray" Padding="0">
+                                <Image Source="{Binding User.DisplayPhotoUrl}" Aspect="AspectFit"/>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ChangePhotoCommand}"/>
+                                </Border.GestureRecognizers>
+                            </Border>
+                            
+
+                            <!-- Ellipse nằm trên ảnh -->
+                               <Ellipse 
+                                    Fill="Purple"
+                                    WidthRequest="20"
+                                    HeightRequest="20"
+                                    VerticalOptions="End" 
+                                    HorizontalOptions="End"
+                                    Margin="2"/>        
+                        </Grid>
+
                         <Button Text="Theo dõi" WidthRequest="100" HeightRequest="30" BackgroundColor="Black" TextColor="White" Margin="10,0,0,0"/>
                     </HorizontalStackLayout>
                 </Grid>
@@ -106,15 +123,15 @@
                     RemainingItemsThresholdReachedCommand="{Binding FetchLikedPostsCommand}" />
             </VerticalStackLayout>
         </ScrollView>
-
         <!-- ActivityIndicator với lớp phủ -->
         <Grid IsVisible="{Binding IsBusy}" BackgroundColor="#80000000" Grid.Row="0">
             <ActivityIndicator IsRunning="{Binding IsBusy}"
-                              Color="White"
-                              VerticalOptions="Center"
-                              HorizontalOptions="Center"
-                              WidthRequest="50"
-                              HeightRequest="50"/>
+                      Color="White"
+                      VerticalOptions="Center"
+                      HorizontalOptions="Center"
+                      WidthRequest="50"
+                      HeightRequest="50"/>
         </Grid>
+
     </Grid>
 </ContentPage>

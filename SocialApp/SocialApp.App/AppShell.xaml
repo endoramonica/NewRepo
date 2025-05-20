@@ -34,7 +34,8 @@
                   Route="LoginPage" />
     <ShellContent Route="HomePage"
                   ContentTemplate="{DataTemplate pages:HomePage}" />
-   
+    <ShellContent Route="CropImagePage"
+              ContentTemplate="{DataTemplate pages:CropImagePage}" />
 
     <ShellContent 
               ContentTemplate="{DataTemplate pages:SignUpPage}"
