@@ -130,7 +130,7 @@
                                         WidthRequest="40"
                                         StrokeShape="RoundRectangle 20"
                                         BackgroundColor="LightGray">
-                                    <Image Source="{Binding UserPhotoUrl}"
+                                    <Image Source="{Binding DisplayPhotoUrl}"
                                            WidthRequest="30"
                                            HeightRequest="30"
                                            Aspect="AspectFit"
