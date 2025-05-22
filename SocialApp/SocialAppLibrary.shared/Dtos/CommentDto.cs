@@ -10,5 +10,6 @@
         public string? UserPhotoUrl { get; set; }
         public DateTime AddedOn { get; set; }
         public string CommentedOnDisplay => AddedOn.ToString("dd MMM yyyy | HH:mm");
+        public string DisplayPhotoUrl => string.IsNullOrWhiteSpace(UserPhotoUrl) ? "add_a_photo.png" : UserPhotoUrl;
     }
 }
