@@ -8,6 +8,7 @@ using SocialApp.Api.Services;
 
 using Microsoft.OpenApi.Models;
 using SocialApp.Api.Endpoint;
+using SocialAppLibrary.Shared;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -132,7 +133,7 @@ app.MapPostsEndpoints();
 app.MapUserEndpoints();
 
 app.UseStaticFiles();
-app.MapHub<SocialApp.Api.Hubs.SocialHubs>("/hubs/social-hub");
+app.MapHub<SocialApp.Api.Hubs.SocialHubs>(AppConstants.HubPattern);
 //#23
 app.Run();
 // add autoDBmigrations 

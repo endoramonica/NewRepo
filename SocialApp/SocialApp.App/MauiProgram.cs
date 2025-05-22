@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using SocialApp.App.Controls;
 using Syncfusion.Maui.Core.Hosting;
+using SocialAppLibrary.Shared;
 
 
 namespace SocialApp.App
@@ -47,13 +48,14 @@ namespace SocialApp.App
             builder.Services.AddTransient<InitPage>();
             builder.Services.AddSingleton<IAppPreferences, AppPreferences>();
             builder.Services.AddSingleton<HomeViewModels>().AddSingleton<HomePage>();
-           
+            builder.Services.AddSingleton<RealTimeUpdatesService>();
+
             ConfigureRefit(builder.Services);
             return builder.Build();
         }
         private static void ConfigureRefit(IServiceCollection services)
         {
-            var baseApiUrl = "https://qjk4ssln-7175.asse.devtunnels.ms";
+            //var baseApiUrl = "https://qjk4ssln-7175.asse.devtunnels.ms";
 
 
 
@@ -69,7 +71,7 @@ namespace SocialApp.App
 
             void SetHttpClient(HttpClient httpClient)
             {
-                httpClient.BaseAddress = new Uri(baseApiUrl);
+                httpClient.BaseAddress = new Uri(AppConstants.ApiBaseUrl);
                 httpClient.Timeout = TimeSpan.FromSeconds(20); // ⏳ Đặt timeout 10 giây
                 Console.WriteLine($"[Refit] BaseAddress set to: {httpClient.BaseAddress}");
 
