@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-using SocialApp.Api.Data.Entities;
-using SocialApp.Api.Data;
-using SocialAppLibrary.Shared.Dtos;
-using Microsoft.Extensions.Hosting;
+﻿using Humanizer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using SocialApp.Api.Data;
+using SocialApp.Api.Data.Entities;
+using SocialApp.Api.Hubs;
+using SocialAppLibrary.Shared.Dtos;
+using SocialAppLibrary.Shared.IHub;
 using System.Security.Cryptography;
 
 namespace SocialApp.Api.Services
@@ -13,17 +17,21 @@ namespace SocialApp.Api.Services
         private readonly DataContext _dataContext; // Quản lý kết nối và tương tác với database
         private readonly PhotoUploadService _photoUploadService;
         private readonly ILogger<PostService> _logger;
+        private readonly IHubContext<SocialHubs, ISocialHubClient> _hubContext;
         private readonly IHttpContextAccessor _httpContextAccessor; // Truy cập HttpContext để lấy thông tin người dùng từ token
 
         // Constructor: Inject các dịch vụ cần thiết để sử dụng trong class
         public PostService(DataContext dataContext,
             PhotoUploadService photoUploadService,
             ILogger<PostService> logger,
+            IHubContext<SocialHubs, ISocialHubClient> hubContext,
             IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
             _photoUploadService = photoUploadService;
             _logger = logger;
+            _hubContext = hubContext;
+
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -151,51 +159,52 @@ namespace SocialApp.Api.Services
 
 
         // Hàm xóa file an toàn, xử lý race condition
-        public async Task<ApiResult> SavePostAsync(SavePost dto, Guid userId)
+        public async Task<ApiResult<PostDto>> SavePostAsync(SavePost dto, LoggedInUser user)
         {
             if (dto == null)
             {
-                return ApiResult.Fail("Dữ liệu không hợp lệ");
+                return ApiResult<PostDto>.Fail("Dữ liệu không hợp lệ");
             }
 
             string? _existingPhotoPath = null;
-
+            Post? post = null;
+            bool sendNotification = false;
             try
             {
                 if (dto.PostId == Guid.Empty)
                 {
                     // Tạo bài viết mới
-                    var post = new Post
+                    post = new Post
                     {
                         Content = dto.Content,
                         PostedOn = DateTime.UtcNow,
-                        UserId = userId,
+                        UserId = user.ID,
                     };
 
                     // Lưu ảnh nếu có
                     if (dto.Photo is not null)
                     {
-                        var (photoPath, photoUrl) = await _photoUploadService.SavePhotoAsync(dto.Photo, "uploads", "images", "users", userId.ToString(), "posts");
-                        post.PhotoPath = photoPath;
-                        post.PhotoUrl = photoUrl;
+                        (post.PhotoPath, post.PhotoUrl) = await _photoUploadService.SavePhotoAsync(dto.Photo, "uploads", "images", "users", user.ID.ToString(), "posts");
+
                     }
 
                     _dataContext.Posts.Add(post);
+                    sendNotification = true;
                 }
                 else
                 {
                     // Tìm bài viết cần chỉnh sửa
-                    var post = await _dataContext.Posts.FindAsync(dto.PostId);
+                    post = await _dataContext.Posts.FindAsync(dto.PostId);
                     if (post is null)
                     {
                         _logger.LogWarning("Không tìm thấy bài viết với ID: {PostId}", dto.PostId);
-                        return ApiResult.Fail("Bài viết không tồn tại");
+                        return ApiResult<PostDto>.Fail("Bài viết không tồn tại");
                     }
 
                     // Kiểm tra quyền chỉnh sửa bài viết
-                    if (post.UserId != userId)
+                    if (post.UserId != user.ID)
                     {
-                        return ApiResult.Fail("Bạn không có quyền chỉnh sửa bài viết này");
+                        return ApiResult<PostDto>.Fail("Bạn không có quyền chỉnh sửa bài viết này");
                     }
 
                     // Cập nhật nội dung bài viết
@@ -208,9 +217,8 @@ namespace SocialApp.Api.Services
                         _existingPhotoPath = post.PhotoPath;
 
                         // Lưu ảnh mới
-                        var (photoPath, photoUrl) = await _photoUploadService.SavePhotoAsync(dto.Photo, "uploads", "images", "users", userId.ToString(), "posts");
-                        post.PhotoPath = photoPath;
-                        post.PhotoUrl = photoUrl;
+                        (post.PhotoPath, post.PhotoUrl) = await _photoUploadService.SavePhotoAsync(dto.Photo, "uploads", "images", "users", user.ID.ToString(), "posts");
+
                     }
                     else if (dto.IsExistingPhotoRemoved)
                     {
@@ -229,20 +237,35 @@ namespace SocialApp.Api.Services
                 {
                     SafeDeleteFile(_existingPhotoPath);
                 }
+                var postDto = new PostDto
+                {
+                    Content = post.Content,
+                    ModifiedOn = post.ModifiedOn,
+                    PhotoUrl = post.PhotoUrl,
+                    PostId = post.Id,
+                    PostedOn = post.PostedOn,
+                    UserId = post.UserId,
+                    UserName = user.Name,
+                    UserPhotoUrl = user.DisplayPhotoUrl
+                };
 
-                return ApiResult.Success();
+                if (sendNotification)
+                {
+                    await _hubContext.Clients.All.PostChange(postDto);
+                }
+                return ApiResult<PostDto>.Success(postDto);
             }
             catch (DbUpdateConcurrencyException)
             {
-                return ApiResult.Fail("Bài viết đã được chỉnh sửa bởi người khác. Hãy tải lại và thử lại.");
+                return ApiResult<PostDto>.Fail("Bài viết đã được chỉnh sửa bởi người khác. Hãy tải lại và thử lại.");
             }
             catch (IOException)
             {
-                return ApiResult.Fail("Không thể xóa ảnh cũ do lỗi hệ thống.");
+                return ApiResult<PostDto>.Fail("Không thể xóa ảnh cũ do lỗi hệ thống.");
             }
             catch (Exception ex)
             {
-                return ApiResult.Fail($"Lỗi không xác định: {ex.Message}");
+                return ApiResult<PostDto>.Fail($"Lỗi không xác định: {ex.Message}");
             }
         }
 
@@ -284,7 +307,7 @@ namespace SocialApp.Api.Services
         //    return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
         //}
 
-        
+
 
         // Xử lí thủ tục lưu trữ (Stored Procedure)
         /* public async Task<PostDto[]> GetPostsAsync(int startIndex, int pageSize, Guid currentUserId)
@@ -335,8 +358,16 @@ namespace SocialApp.Api.Services
         //#19 Lưu bình luận cho bài đăng
         public async Task<ApiResult<CommentDto>> SaveCommentAsync(SaveCommentDto dto, LoggedInUser currentUser)
         {
-            Comment? comment = null;
+            // Kiểm tra xem bài viết có tồn tại không
+            var postExistsOwnerId = await _dataContext.Posts
+                .Where(p => p.Id == dto.PostId  )
+                .Select(p => p.UserId)
+                .FirstOrDefaultAsync();
+            if (postExistsOwnerId == default)
+                return ApiResult<CommentDto>.Fail("Post not found");
 
+            Comment? comment = null;
+            bool sendNotification = false;
             // Kiểm tra xem đây là comment mới hay comment đã tồn tại
             if (dto.CommentId == Guid.Empty)
             {
@@ -351,6 +382,7 @@ namespace SocialApp.Api.Services
 
                 // Thêm comment mới vào DbContext
                 _dataContext.Comments.Add(comment);
+                sendNotification = true;
             }
             else
             {
@@ -371,7 +403,7 @@ namespace SocialApp.Api.Services
 
                 // Cập nhật nội dung và thời gian chỉnh sửa của comment
                 comment.Content = dto.Content;
-                
+
 
                 // Đánh dấu comment là đã được chỉnh sửa trong DbContext
                 _dataContext.Comments.Update(comment);
@@ -392,7 +424,18 @@ namespace SocialApp.Api.Services
                     UserName = currentUser.Name,
                     UserPhotoUrl = currentUser.PhotoUrl
                 };
-
+                if (sendNotification)
+                {
+                    var notification = new NotificationDto
+                    (
+                        postExistsOwnerId,
+                        $"{currentUser.Name} commented on your post",
+                        DateTime.Now,
+                        dto.PostId
+                    );
+                    await SaveNotificationAsync(notification);
+                    await _hubContext.Clients.All.PostCommentAdded(commentDto);
+                }
                 // Trả về kết quả thành công cùng với thông tin comment
                 return ApiResult<CommentDto>.Success(commentDto);
             }
@@ -408,31 +451,31 @@ namespace SocialApp.Api.Services
             }
         }
         //#19 Truy xuất/hiển thị bình luận cho bài đăng
-       public async Task<CommentDto[]> GetCommentsAsync(Guid postId , int startIndex , int pageSize)
-{
-    // Truy vấn danh sách bình luận theo postId từ cơ sở dữ liệu
-    var comments = await _dataContext.Comments
-        .Where(c => c.PostId == postId)  // Lọc các bình luận thuộc bài viết có postId tương ứng
-        .OrderByDescending(c => c.AddedOn) // Sắp xếp bình luận theo thời gian giảm dần (mới nhất trước)
-        .Skip(startIndex)
-        .Take(pageSize)
-        .Select(c => new CommentDto  // Chuyển đổi dữ liệu từ Entity sang DTO (Data Transfer Object)
+        public async Task<CommentDto[]> GetCommentsAsync(Guid postId, int startIndex, int pageSize)
         {
-            CommentId = c.Id,  // ID của bình luận
-            Content = c.Content, // Nội dung của bình luận
-            AddedOn = c.AddedOn, // Thời gian bình luận được thêm vào
-            UserId = c.UserId, // ID của người dùng bình luận
-            UserName = c.User.Name, // Tên của người dùng bình luận
-            UserPhotoUrl = c.User.PhotoUrl // Ảnh đại diện của người dùng
-        })
-        .ToArrayAsync(); // Thực hiện truy vấn bất đồng bộ và chuyển kết quả thành mảng
+            // Truy vấn danh sách bình luận theo postId từ cơ sở dữ liệu
+            var comments = await _dataContext.Comments
+                .Where(c => c.PostId == postId)  // Lọc các bình luận thuộc bài viết có postId tương ứng
+                .OrderByDescending(c => c.AddedOn) // Sắp xếp bình luận theo thời gian giảm dần (mới nhất trước)
+                .Skip(startIndex)
+                .Take(pageSize)
+                .Select(c => new CommentDto  // Chuyển đổi dữ liệu từ Entity sang DTO (Data Transfer Object)
+                {
+                    CommentId = c.Id,  // ID của bình luận
+                    Content = c.Content, // Nội dung của bình luận
+                    AddedOn = c.AddedOn, // Thời gian bình luận được thêm vào
+                    UserId = c.UserId, // ID của người dùng bình luận
+                    UserName = c.User.Name, // Tên của người dùng bình luận
+                    UserPhotoUrl = c.User.PhotoUrl // Ảnh đại diện của người dùng
+                })
+                .ToArrayAsync(); // Thực hiện truy vấn bất đồng bộ và chuyển kết quả thành mảng
 
-    return comments; // Trả về danh sách bình luận dưới dạng mảng DTO
-}
+            return comments; // Trả về danh sách bình luận dưới dạng mảng DTO
+        }
 
-         //#20 Vấn đề 1: Đặt comment line cho code
+        //#20 Vấn đề 1: Đặt comment line cho code
 
-        public async Task<ApiResult> DeletePostAsync(Guid postId, Guid currentUserId)
+        public async Task<ApiResult> DeletePostAsync(Guid postId, LoggedInUser currentUser)
         {
             try
             {
@@ -442,12 +485,13 @@ namespace SocialApp.Api.Services
                     return ApiResult.Fail("Post not found"); // Trả về lỗi nếu không tìm thấy bài viết
 
                 // Kiểm tra xem người dùng hiện tại có phải chủ bài viết không
-                if (post.UserId != currentUserId)
+                if (post.UserId != currentUser.ID)
                     return ApiResult.Fail("You can delete your own posts only"); // Chỉ cho phép xóa bài viết của chính mình
 
                 // Xóa bài viết khỏi cơ sở dữ liệu
                 _dataContext.Posts.Remove(post);
                 await _dataContext.SaveChangesAsync(); // Lưu thay đổi
+                await _hubContext.Clients.All.PostDelete(postId);
                 return ApiResult.Success(); // Trả về kết quả thành công
             }
             catch (Exception ex)
@@ -456,26 +500,31 @@ namespace SocialApp.Api.Services
             }
         }
 
-        public async Task<ApiResult> ToggleBookmarkAsync(Guid postId, Guid currentUserId)
+        public async Task<ApiResult> ToggleBookmarkAsync(Guid postId, LoggedInUser currentUser)
         {
             // Kiểm tra xem bài viết có tồn tại không
-            var postExists = await _dataContext.Posts.AnyAsync(p => p.Id == postId);
-            if (!postExists)
+            var postExistsOwnerId = await _dataContext.Posts
+                .Where(p => p.Id == postId)
+                .Select(p => p.UserId)
+                .FirstOrDefaultAsync();
+            if (postExistsOwnerId == default)
                 return ApiResult.Fail("Post not found");
 
             try
             {
+                bool sendNotification = false;
                 // Kiểm tra xem bài viết đã được đánh dấu yêu thích chưa
-                var bookmark = await _dataContext.Bookmarks.FirstOrDefaultAsync(l => l.PostId == postId && l.UserId == currentUserId);
+                var bookmark = await _dataContext.Bookmarks.FirstOrDefaultAsync(l => l.PostId == postId && l.UserId == currentUser.ID);
                 if (bookmark is null)
                 {
                     // Nếu chưa, tạo mới bookmark
                     bookmark = new Bookmarks
                     {
                         PostId = postId,
-                        UserId = currentUserId
+                        UserId = currentUser.ID
                     };
                     _dataContext.Bookmarks.Add(bookmark);
+                    sendNotification = true;
                 }
                 else
                 {
@@ -483,6 +532,19 @@ namespace SocialApp.Api.Services
                     _dataContext.Bookmarks.Remove(bookmark);
                 }
                 await _dataContext.SaveChangesAsync(); // Lưu thay đổi
+                if (sendNotification)
+                {
+                    var notificationDto = new NotificationDto
+                (
+                    postExistsOwnerId,
+                    $"{currentUser.Name} saved your post",
+                    DateTime.Now,
+                    postId
+
+                    );
+                    await SaveNotificationAsync(notificationDto);
+                    await _hubContext.Clients.All.NotificationGenerated(notificationDto);
+                }
                 return ApiResult.Success(); // Trả về kết quả thành công
             }
             catch (Exception ex)
@@ -491,24 +553,28 @@ namespace SocialApp.Api.Services
             }
         }
 
-        public async Task<ApiResult> ToggleLikeAsync (Guid postId, Guid currentUserId)
+        public async Task<ApiResult> ToggleLikeAsync(Guid postId, LoggedInUser currentUser)
         {
             // Kiểm tra xem bài viết có tồn tại không
-            var postExists = await _dataContext.Posts.AnyAsync(p => p.Id == postId);
-            if (!postExists)
+            var postExistsOwnerId = await _dataContext.Posts
+                .Where(p => p.Id == postId)
+                .Select(p => p.UserId)
+                .FirstOrDefaultAsync();
+            if (postExistsOwnerId == default)
                 return ApiResult.Fail("Post not found");
 
             try
             {
+                bool sendNotification = false;
                 // Kiểm tra xem bài viết đã được like chưa
-                var like = await _dataContext.Likes.FirstOrDefaultAsync(l => l.PostId == postId && l.UserId == currentUserId);
+                var like = await _dataContext.Likes.FirstOrDefaultAsync(l => l.PostId == postId && l.UserId == currentUser.ID);
                 if (like is null)
                 {
                     // Nếu chưa, tạo mới like
                     like = new Likes
                     {
                         PostId = postId,
-                        UserId = currentUserId
+                        UserId = currentUser.ID
                     };
                     _dataContext.Likes.Add(like);
                 }
@@ -518,6 +584,18 @@ namespace SocialApp.Api.Services
                     _dataContext.Likes.Remove(like);
                 }
                 await _dataContext.SaveChangesAsync(); // Lưu thay đổi
+                if (sendNotification)
+                { var notificationDto = new NotificationDto
+                (
+                    postExistsOwnerId,
+                    $"{currentUser.Name} liked your post",
+                    DateTime.Now,
+                    postId
+
+                    );
+                    await SaveNotificationAsync(notificationDto);
+                    await _hubContext.Clients.All.NotificationGenerated(notificationDto);
+                }
                 return ApiResult.Success(); // Trả về kết quả thành công
             }
             catch (Exception ex)
@@ -540,7 +618,43 @@ namespace SocialApp.Api.Services
         // 4. Kiểm tra điều kiện (bài viết tồn tại, quyền sở hữu)
         // 5. Xử lý lỗi và đảm bảo API trả về phản hồi hợp lý
         // 6. Viết prompt mô tả chính xác yêu cầu để AI có thể tạo ra code đúng ý
+        private async Task SaveNotificationAsync(NotificationDto dto)
+        {
+            try
+            {
+                // Kiểm tra người dùng có tồn tại không
+                var userExists = await _dataContext.Users.AnyAsync(u => u.Id == dto.ForUserId);
+                if (!userExists)
+                {
+                    throw new Exception("User not found");
+                }
 
+                // Kiểm tra bài viết có tồn tại không
+                var postExists = await _dataContext.Posts.AnyAsync(p => p.Id == dto.PostId);
+                if (!postExists)
+                {
+                    throw new Exception("Post not found");
+                }
+
+                var notification = new Notification
+                {
+                    ForUserId = dto.ForUserId,
+                    PostId = dto.PostId,
+                    Text = dto.Text,
+                    When = dto.When
+                };
+
+                _dataContext.Notifications.Add(notification);
+                await _dataContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving notification");
+                throw;
+            }
+        }
 
     }
+
+
 }

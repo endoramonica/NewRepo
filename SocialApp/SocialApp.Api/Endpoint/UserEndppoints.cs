@@ -45,6 +45,11 @@ namespace SocialApp.Api.Endpoint
                 Endpoint /bookmarked-posts có tên trùng với endpoint /posts.
                 Các endpoints đều trả về responses được bao bọc trong Results.Ok, cho thấy đây là responses thành công (200 OK).
                 Các endpoints đều chỉ định kiểu response trả về sử dụng .Produces<>(). */
+            // GET /liked-posts: Lấy danh sách bài viết đã thích của người dùng
+            userGroup.MapGet("/liked-posts", async (int startIndex, int pageSize, [FromServices] UserService userService, ClaimsPrincipal principal) =>
+                Results.Ok(await userService.GetUserLikedPostsAsync(startIndex, pageSize, principal.GetUserId())))
+                .Produces<PostDto[]>()
+                .WithName("GetUserLikedPosts");
 
             return app;
         }

@@ -1,9 +1,12 @@
 ﻿
 
 
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using SocialApp.Api.Data;
+using SocialApp.Api.Hubs;
 using SocialAppLibrary.Shared.Dtos;
+using SocialAppLibrary.Shared.IHub;
 
 namespace SocialApp.Api.Services
 {
@@ -11,11 +14,13 @@ namespace SocialApp.Api.Services
     {
         private readonly DataContext _dataContext;
         private readonly PhotoUploadService _photoUploadService;
+        private readonly IHubContext<SocialHubs, ISocialHubClient> _hubContext;
 
-        public UserService( DataContext dataContext , PhotoUploadService photoUploadService) 
+        public UserService( DataContext dataContext , PhotoUploadService photoUploadService, IHubContext<SocialHubs,ISocialHubClient> hubContext) 
         { 
             _dataContext = dataContext;
            _photoUploadService = photoUploadService;
+            _hubContext = hubContext;
         }
         public async Task<ApiResult<string>> ChangePhotoAsync(IFormFile photo, Guid currentUserId)
         {
@@ -41,7 +46,7 @@ namespace SocialApp.Api.Services
                 // 🔹 5. Cập nhật thông tin user trong database
                 _dataContext.Users.Update(user);
                 await _dataContext.SaveChangesAsync();
-
+                await _hubContext.Clients.All.UserPhotoChange(new UserPhotoChange ( currentUserId, user.PhotoUrl)); // Gửi thông báo đến tất cả client về việc thay đổi ảnh đại diện của user
                 // 🔹 6. Nếu user đã có ảnh trước đó, xóa ảnh cũ khỏi hệ thống
                 if (!string.IsNullOrWhiteSpace(existingPhotoPath) && File.Exists(existingPhotoPath))
                 {
@@ -73,6 +78,15 @@ namespace SocialApp.Api.Services
             var posts = await _dataContext.Set<PostDto>()
      .FromSqlInterpolated($"EXEC GetUserBookmarkedPosts @StartIndex={startIndex}, @PageSize={pageSize}, @CurrentUserId = {currentUserId}")
      .ToArrayAsync();
+
+            return posts;
+        }
+        public async Task<PostDto[]> GetUserLikedPostsAsync(int startIndex, int pageSize, Guid currentUserId)
+        {
+            // Executes the stored procedure 'GetUserLikedPosts' to retrieve paginated liked posts for the user.
+            var posts = await _dataContext.Set<PostDto>()
+                .FromSqlInterpolated($"EXEC GetUserLikedPosts @StartIndex={startIndex}, @PageSize={pageSize}, @CurrentUserId={currentUserId}")
+                .ToArrayAsync();
 
             return posts;
         }

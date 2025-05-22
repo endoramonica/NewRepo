@@ -67,10 +67,10 @@ ClaimsPrincipal principal) =>
                 }
 
                 dto.Photo = request.Photo;
-                return Results.Ok(await postService.SavePostAsync(dto, principal.GetUserId()));
+                return Results.Ok(await postService.SavePostAsync(dto, principal.GetUser()));
             })
-.Produces<ApiResult>(StatusCodes.Status200OK)
-.Produces<ApiResult>(StatusCodes.Status400BadRequest)
+.Produces<ApiResult<PostDto>>(StatusCodes.Status200OK)
+.Produces<ApiResult<PostDto>>(StatusCodes.Status400BadRequest)
 .DisableAntiforgery()
 .WithName("SavePost");
 
@@ -100,7 +100,7 @@ ClaimsPrincipal principal) =>
             // Endpoint để bật/tắt trạng thái "Like" của bài viết (POST: /api/posts/{postId}/toggle-like)
             postsGroup.MapPost("/{postId:guid}/toggle-like", async (Guid postId, PostService postService, ClaimsPrincipal principal) =>
             {
-                var result = await postService.ToggleLikeAsync(postId, principal.GetUserId());
+                var result = await postService.ToggleLikeAsync(postId, principal.GetUser());
                 return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
             })
                 .Produces<ApiResult>(StatusCodes.Status200OK)
@@ -110,7 +110,7 @@ ClaimsPrincipal principal) =>
             // Endpoint để bật/tắt trạng thái "Bookmark" của bài viết (POST: /api/posts/{postId}/toggle-bookmark)
             postsGroup.MapPost("/{postId:guid}/toggle-bookmark", async (Guid postId, PostService postService, ClaimsPrincipal principal) =>
             {
-                var result = await postService.ToggleBookmarkAsync(postId, principal.GetUserId());
+                var result = await postService.ToggleBookmarkAsync(postId, principal.GetUser());
                 return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
             })
                 .Produces<ApiResult>(StatusCodes.Status200OK)
@@ -120,7 +120,7 @@ ClaimsPrincipal principal) =>
             // Endpoint để xóa bài viết (DELETE: /api/posts/{postId})
             postsGroup.MapDelete("/{postId:guid}/DeletePost", async (Guid postId, PostService postService, ClaimsPrincipal principal) =>
             {
-                var result = await postService.DeletePostAsync(postId, principal.GetUserId());
+                var result = await postService.DeletePostAsync(postId, principal.GetUser());
                 return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
             })
                 .Produces<ApiResult>(StatusCodes.Status200OK)

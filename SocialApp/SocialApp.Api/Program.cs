@@ -78,7 +78,13 @@ builder.Services.AddAuthentication(options =>
 //#23 Điều này cho phép API kiểm tra quyền của người dùng sau khi đã xác thực
 builder.Services.AddAuthorization();
 
-
+builder.Services.AddSignalR(options =>
+{
+    // Cấu hình SignalR
+    options.EnableDetailedErrors = true;
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+    options.HandshakeTimeout = TimeSpan.FromSeconds(15);
+});
 
 builder.Services.AddAntiforgery();
 
@@ -126,7 +132,7 @@ app.MapPostsEndpoints();
 app.MapUserEndpoints();
 
 app.UseStaticFiles();
-
+app.MapHub<SocialApp.Api.Hubs.SocialHubs>("/hubs/social-hub");
 //#23
 app.Run();
 // add autoDBmigrations 
