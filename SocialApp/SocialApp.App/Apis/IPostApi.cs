@@ -19,7 +19,7 @@ public interface IPostApi
     // );
     [Multipart]
     [Post("/api/posts/save")]
-    Task<ApiResult> SavePostAsync([AliasAs("photo")] StreamPart? photo, [AliasAs("SerializedSavePostDto")] string? SerializedSavePostDto);
+    Task<ApiResult<PostDto>> SavePostAsync([AliasAs("photo")] StreamPart? photo, [AliasAs("SerializedSavePostDto")] string? SerializedSavePostDto);
 
     [Get("/api/posts")]
     Task<PostDto[]> GetPostsAsync(int startIndex, int pageSize);

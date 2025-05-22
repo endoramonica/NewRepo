@@ -89,18 +89,29 @@ public partial class CropImagePage : ContentPage, IQueryAttributable
         }
 
         imageEditor.SaveEdits();
-        var newPhotoStream = await imageEditor.GetImageStream();
+
+        using var newPhotoStream = await imageEditor.GetImageStream();
+        if (newPhotoStream == null)
+        {
+            await Shell.Current.DisplayAlert("Error", "Failed to get image stream.", "OK");
+            return;
+        }
 
         var extension = Path.GetExtension(PhotoSource);
-
         var tempPath = Path.Combine(FileSystem.CacheDirectory, $"{Guid.NewGuid()}{extension}");
 
-        using (var fileStream = File.OpenWrite(tempPath))
-        { 
-        await newPhotoStream.CopyToAsync(fileStream);
+        try
+        {
+            using var fileStream = File.OpenWrite(tempPath);
+            await newPhotoStream.CopyToAsync(fileStream);
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", $"Failed to save image: {ex.Message}", "OK");
+            return;
         }
 
         await Shell.Current.GoToAsync($"//CropImagePage?new-src={Uri.EscapeDataString(tempPath)}");
-
     }
+
 }

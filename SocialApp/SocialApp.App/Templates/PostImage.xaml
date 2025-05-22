@@ -25,7 +25,7 @@
                         WidthRequest="40"
                         StrokeShape="RoundRectangle 20"
                         BackgroundColor="Aqua">
-                    <Image Source="{Binding UserPhotoUrl }"
+                    <Image Source="{Binding UserPhoto }"
                            WidthRequest="30"
                            HeightRequest="30"
                            VerticalOptions="Center"

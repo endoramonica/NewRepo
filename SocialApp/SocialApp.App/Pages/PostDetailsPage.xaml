@@ -26,14 +26,22 @@
                         <TapGestureRecognizer Command="{Binding BackHomeCommand }" />
                     </Image.GestureRecognizers>
                 </Image>
-                <Image Grid.Column="1" Source="ngoisao.png" HeightRequest="30" WidthRequest="30"/>
+                <Image Grid.Column="1" Source="pin_drop.png" HeightRequest="30" WidthRequest="30"/>
                 <Image Grid.Column="2" Source="delete.png" HeightRequest="30" WidthRequest="30">
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding DeletePostCommand}"
                             />
                     </Image.GestureRecognizers>
                 </Image>
-                <Image Grid.Column="3" Source="pink_heart.png" HeightRequest="30" WidthRequest="30"/>
+                <Image Grid.Column="3" Source="ngoisao.png" HeightRequest="30" WidthRequest="30">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding EditPostCommand  }" CommandParameter="{Binding Post}"/>
+                    </Image.GestureRecognizers>
+                </Image>
+                
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding EditPostCommand }" />
+                </Grid.GestureRecognizers>
             </Grid>
         </Grid>
 

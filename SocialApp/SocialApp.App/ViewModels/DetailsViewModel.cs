@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using SocialApp.App.Apis;
 using SocialApp.App.Models;
+using SocialApp.App.Pages;
 using SocialApp.App.Services;
 using SocialAppLibrary.Shared.Dtos;
 using System;
@@ -144,6 +145,15 @@ public partial class DetailsViewModel : PostBaseViewModel
     {
 
         await NavigationAsync("//HomePage");
+    }
+    [RelayCommand]
+    private async Task EditPostAsync(PostModel post)
+    {
+        var param = new Dictionary<string, object>()
+        {
+            [nameof(SavePostViewModel.Post)] = post
+        };
+        await NavigationAsync("///CreatePostPage",param);
     }
 }
 

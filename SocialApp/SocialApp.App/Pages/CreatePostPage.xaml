@@ -185,5 +185,11 @@
                 TextColor="White"
                 Command="{Binding SavePostCommand}" />
         <!-- Nút đăng bài, khi bấm sẽ gọi command SavePostCommand trong ViewModel -->
+        <!-- ===== ActivityIndicator ===== -->
+        <ActivityIndicator 
+                                   IsRunning="{Binding IsBusy}" 
+                                   VerticalOptions="Center" 
+                                   HorizontalOptions="Center" 
+                                   Color="Blue" />
     </Grid>
 </ContentPage>
