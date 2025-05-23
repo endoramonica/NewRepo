@@ -1,4 +1,5 @@
 ﻿
+using SocialApp.App.Services;
 using SocialApp.App.ViewModels;
 
 namespace SocialApp.App.Pages;
@@ -6,10 +7,13 @@ namespace SocialApp.App.Pages;
 public partial class Profile : ContentPage
 {
     private readonly ProfileViewModel _viewModel;
-    public Profile( ProfileViewModel profileViewModel)
+    private readonly RealTimeUpdatesService _realTimeUpdatesService;
+
+    public Profile( ProfileViewModel profileViewModel , RealTimeUpdatesService realTimeUpdatesService )
 	{
 		InitializeComponent();
         _viewModel = profileViewModel;
+        _realTimeUpdatesService = realTimeUpdatesService;
         BindingContext = _viewModel;
     }
   
@@ -25,6 +29,13 @@ public partial class Profile : ContentPage
             this.TranslateTo(0, 0, 600, Easing.CubicOut), // Trượt lên
             this.FadeTo(1, 600) // Làm mờ dần
         );
+        _viewModel.ConfigureRealTimeUpdates();
+    }
+    
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _realTimeUpdatesService.RemoveHandler(nameof(ProfileViewModel));
     }
 
 }

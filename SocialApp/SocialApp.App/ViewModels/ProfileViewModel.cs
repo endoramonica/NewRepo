@@ -6,6 +6,7 @@ using SocialApp.App.Models;
 using SocialApp.App.Pages;
 using SocialApp.App.Services;
 using SocialAppLibrary.Shared.Dtos;
+using SocialAppLibrary.Shared.IHub;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -16,11 +17,13 @@ public partial class ProfileViewModel : PostBaseViewModel
 {
     private readonly AuthService _authService;
     private readonly IUserApi _userApi;
+    private readonly RealTimeUpdatesService _realTimeUpdatesService;
 
-    public ProfileViewModel(IPostApi postApi, AuthService authService, IUserApi userApi) : base(postApi)
+    public ProfileViewModel(IPostApi postApi, AuthService authService, IUserApi userApi , RealTimeUpdatesService realTimeUpdatesService) : base(postApi)
     {
         _authService = authService!;
         _userApi = userApi;
+       _realTimeUpdatesService = realTimeUpdatesService;
         User = _authService.User!;
     }
 
@@ -175,7 +178,26 @@ public partial class ProfileViewModel : PostBaseViewModel
             }
         });
     }
+    protected override void OnToggleBookmarkedAsync(PostModel postModel)
+    {
+        var currentPost = BookMarkedPost.FirstOrDefault(p => p.PostId == postModel.PostId);
 
+        if (currentPost != null && !postModel.IsBookmarked)
+        {
+            BookMarkedPost.Remove(currentPost);
+
+        }
+    }
+    protected override void OnToggleLikedAsync(PostModel postModel)
+    {
+        var currentPost = LikedPosts.FirstOrDefault(p => p.PostId == postModel.PostId);
+
+        if (currentPost != null && !postModel.IsLiked)
+        {
+            LikedPosts.Remove(currentPost);
+
+        }
+    }
     [RelayCommand]
     private async Task ChangePhotoAsync()
     {
@@ -225,6 +247,84 @@ public partial class ProfileViewModel : PostBaseViewModel
             });
         }
     }
+    #region Real-time Events
+
+    public void ConfigureRealTimeUpdates()
+    {
+        _realTimeUpdatesService.AddPostChangeAction(nameof(ProfileViewModel), OnPostChange);
+        _realTimeUpdatesService.AddPostDeleteAction(nameof(ProfileViewModel), OnPostDeleted);
+        _realTimeUpdatesService.AddUserPhotoChangeAction(nameof(ProfileViewModel), OnUserPhotoChanged);
+        //_realTimeUpdatesService.AddNotificationGeneratedAction(nameof(ProfileViewModel), OnNotificationGenerated);
+    }
+
+    private void OnPostChange(PostDto post)
+    {
+        var myPost = MyPosts.FirstOrDefault(p => p.PostId == post.PostId);
+        if (myPost != null)
+        {
+            myPost.Content = post.Content;
+            // myPost.ImageUrl = post.ImageUrl;
+            myPost.IsBookmarked = post.IsBookmarked;
+            myPost.IsLiked = post.IsLiked;
+            //myPost.LikeCount = post.LikeCount;
+            //myPost.BookmarkCount = post.BookmarkCount;
+        }
+        var myBookmarkedPost = BookMarkedPost.FirstOrDefault(p => p.PostId == post.PostId);
+        if (myBookmarkedPost != null) {
+            myBookmarkedPost.Content = post.Content;
+            // myPost.ImageUrl = post.ImageUrl;
+            myBookmarkedPost.IsBookmarked = post.IsBookmarked;
+            myBookmarkedPost.IsLiked = post.IsLiked;
+            //myPost.LikeCount = post.LikeCount;
+            //myPost.BookmarkCount = post.BookmarkCount;
+        }
+        var myLikedPost = LikedPosts.FirstOrDefault(p => p.PostId == post.PostId);
+        if (myLikedPost != null)
+        {
+            myLikedPost.Content = post.Content;
+            // myPost.ImageUrl = post.ImageUrl;
+            myLikedPost.IsBookmarked = post.IsBookmarked;
+            myLikedPost.IsLiked = post.IsLiked;
+            //myPost.LikeCount = post.LikeCount;
+            //myPost.BookmarkCount = post.BookmarkCount;
+        }
+    }
+
+    private  void  OnPostDeleted(Guid postId)
+    {
+        var myPost = MyPosts.FirstOrDefault(p => p.PostId == postId);
+        if (myPost != null)
+        {
+           MyPosts.Remove(myPost);
+        }
+        var myBookmarkedPost = BookMarkedPost.FirstOrDefault(p => p.PostId == postId);
+        if (myBookmarkedPost != null)
+        {
+            BookMarkedPost.Remove(myBookmarkedPost);
+        }
+        var myLikedPost = LikedPosts.FirstOrDefault(p => p.PostId == postId);
+        if (myLikedPost != null)
+        {
+            LikedPosts.Remove(myLikedPost);
+        }
+    }
+
+    private void OnUserPhotoChanged(UserPhotoChange change)
+    {
+        if (change.UserId == User.ID)
+        {
+            foreach (var post in MyPosts)
+            { post.UserPhotoUrl = change.UserPhotoUrl; }
+            foreach (var post in BookMarkedPost.Where(post=>post.UserId == change.UserId))
+            { post.UserPhotoUrl = change.UserPhotoUrl; }
+            foreach (var post in LikedPosts.Where(post => post.UserId == change.UserId))
+            { post.UserPhotoUrl = change.UserPhotoUrl; }
+        }
+    }
+
+    
+
+    #endregion
     #region Methods
     [RelayCommand]
     private async Task OpenSettingsAsync()
@@ -232,6 +332,6 @@ public partial class ProfileViewModel : PostBaseViewModel
         
         await Shell.Current.GoToAsync("//HomePage");
     }
-
+    
     #endregion
 }

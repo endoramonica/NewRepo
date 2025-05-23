@@ -72,6 +72,10 @@ namespace SocialApp.Api.Data
                 .HasOne(c => c.User)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Notification>()
+                .HasOne(c => c.Post)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
 

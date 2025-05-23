@@ -43,12 +43,17 @@
                         <Grid WidthRequest="50" HeightRequest="50">
                             <!-- Border chứa ảnh -->
                             <Border StrokeShape="RoundRectangle 45" Stroke="LightGray" Padding="0">
-                                <Image Source="{Binding User.DisplayPhotoUrl}" Aspect="AspectFit"/>
+                                <Image HeightRequest="60" WidthRequest="60" Source="{Binding User.DisplayPhotoUrl}" Aspect="AspectFit">
+                                    <Image.Clip>
+                                        <EllipseGeometry Center="30,30" RadiusX="30" RadiusY="30"/>
+                                    </Image.Clip>
+                                </Image>
                                 <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding ChangePhotoCommand}"/>
+                                    <TapGestureRecognizer Command="{Binding ChangePhotoCommand}" />
                                 </Border.GestureRecognizers>
                             </Border>
-                            
+
+
 
                             <!-- Ellipse nằm trên ảnh -->
                                <Ellipse 

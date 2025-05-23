@@ -5,6 +5,7 @@ using SocialApp.App.Models;
 using SocialApp.App.Pages;
 using SocialApp.App.Services;
 using SocialAppLibrary.Shared.Dtos;
+using SocialAppLibrary.Shared.IHub;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,14 +21,15 @@ namespace SocialApp.App.ViewModels;
 public partial class DetailsViewModel : PostBaseViewModel
 {
     private readonly AuthService _authService;
-    
-   
-    public DetailsViewModel(AuthService authService , IPostApi postApi) : base(postApi)
+    private readonly RealTimeUpdatesService _realTimeUpdatesService;
+
+    public DetailsViewModel(AuthService authService , IPostApi postApi , RealTimeUpdatesService realTimeUpdatesService) : base(postApi)
     { 
         _authService = authService;
-       
+        _realTimeUpdatesService = realTimeUpdatesService;
         SkipGoToDetailsPage = true; // Skip the navigation to the details page
         //FetchCommentsAsync();
+        
     }
 
     [ObservableProperty]
@@ -99,9 +101,9 @@ public partial class DetailsViewModel : PostBaseViewModel
                     await ShowErrorAlertAsync(result.Error);
                     return;
                 }
-                var addedComment = result.Data;
-                Comments = [addedComment, .. Comments]; // Add the new comment to the collection
-                                                        // Clear the comment entry field
+                //var addedComment = result.Data;
+                //Comments = [addedComment, .. Comments]; // Add the new comment to the collection
+                //23/5 no need here cause a signal ill be sent instead of                                         // Clear the comment entry field
                 CommentContent = string.Empty; // Clear the input field
                 OnPropertyChanged(nameof(Comments)); // Notify the UI about the change
                 await ToastAsync("Comment added successfully.");
@@ -155,5 +157,69 @@ public partial class DetailsViewModel : PostBaseViewModel
         };
         await NavigationAsync("///CreatePostPage",param);
     }
+    #region Real-time Events
+
+    public void ConfigureRealTimeUpdates()
+    {
+        _realTimeUpdatesService.AddPostChangeAction(nameof(DetailsViewModel), OnPostChange);
+        _realTimeUpdatesService.AddPostDeleteAction(nameof(DetailsViewModel), OnPostDeleted);
+        _realTimeUpdatesService.AddUserPhotoChangeAction(nameof(DetailsViewModel), OnUserPhotoChanged);
+        _realTimeUpdatesService.AddCommentAddedAction(nameof(DetailsViewModel), OnCommentAdded);
+    }
+
+
+    private void OnPostChange(PostDto post)
+    {
+        if(Post.PostId == post.PostId)
+        {
+            
+               Post.Content = post.Content;
+                Post.PhotoUrl = post.PhotoUrl;
+                Post.IsLiked = post.IsLiked;
+                Post.IsBookmarked = post.IsBookmarked;
+                //Post.LikeCount = post.LikeCount;
+                //Post.BookmarkCount = post.BookmarkCount;
+                //Post.CommentCount = post.CommentCount;
+            
+        }
+    }
+
+    private async void OnPostDeleted(Guid postId)
+    {
+        if(Post.PostId == postId)
+        {
+            // Handle the deletion of the post
+            // For example, navigate back to the home page or show a message
+            await ToastAsync("Post no longer exist");
+            Shell.Current.GoToAsync("//HomePage");
+        }
+    }
+
+    private void OnUserPhotoChanged(UserPhotoChange change)
+    {
+        if (Post.UserId == change.UserId)
+        {
+            Post.UserPhotoUrl = change.UserPhotoUrl;// change.userphotourl(photourl) cua realtime 
+            foreach (var comment in Comments.Where(c=>c.UserId == change.UserId))
+            {
+                
+                    comment.UserPhotoUrl = change.UserPhotoUrl;
+                
+            }
+
+        }
+    }
+    
+    private void OnCommentAdded(CommentDto comment)
+    {
+        if (Post.PostId == comment.PostId)
+        {
+            
+            Comments = [comment, .. Comments];
+            OnPropertyChanged(nameof(Comments));
+        }
+    }
+
+    #endregion
 }
 

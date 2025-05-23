@@ -1,41 +1,52 @@
-﻿    using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Refit;
 using SocialApp.App.Apis;
 using SocialApp.App.Models;
-using SocialApp.App.Pages;
 using SocialApp.App.Services;
 using SocialAppLibrary.Shared.Dtos;
 using SocialAppLibrary.Shared.IHub;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SocialApp.App.ViewModels
 {
-    public partial class HomeViewModels:PostBaseViewModel
+    public partial class HomeViewModels : PostBaseViewModel
     {
-       private readonly RealTimeUpdatesService _realTimeUpdatesService;
-        public HomeViewModels(IPostApi postApi, RealTimeUpdatesService realTimeUpdatesService) : base(postApi) 
+        #region Constructor & Init
+
+        private readonly RealTimeUpdatesService _realTimeUpdatesService;
+        private readonly AuthService _authService;
+
+        public HomeViewModels(IPostApi postApi, RealTimeUpdatesService realTimeUpdatesService, AuthService authService)
+            : base(postApi)
         {
-          
             FetchPostAsync();
             _realTimeUpdatesService = realTimeUpdatesService;
-            ConfigureRealTimeUpdates();
+            _authService = authService;
+           
         }
-        public ObservableCollection<PostModel> Posts { get; set; } = [];
-        //public ObservableCollection<PostDto> Posts { get; set; } = new ObservableCollection<PostDto>();
 
-        private int _startIndex = 0; 
+        #endregion
+
+        #region Properties
+
+        public ObservableCollection<PostModel> Posts { get; set; } = [];
+
+        private int _startIndex = 0;
         private const int PageSize = 10;
-        
+
+        [ObservableProperty]
+        private bool _isRefreshView;
+
+        [ObservableProperty]
+        private bool _isThereNewNotification;
+
+        #endregion
+
+        #region Fetch/Refresh
 
         [RelayCommand]
-        private async Task FetchPostAsync ()
+        private async Task FetchPostAsync()
         {
             await MakeApiCall(async () =>
             {
@@ -44,86 +55,55 @@ namespace SocialApp.App.ViewModels
                 {
                     if (_startIndex == 0 && Posts.Count > 0)
                     {
-                        //this is pull to refresh case 
-                        //resey the post observable collection 
-                        Posts.Clear();
-
+                        Posts.Clear(); // Đây là trường hợp pull-to-refresh
                     }
+
                     _startIndex += posts.Length;
+
                     foreach (var p in posts)
                     {
                         Posts.Add(PostModel.FromDto(p));
                     }
-
                 }
-               
-
-
             });
-            
-
         }
-        [ObservableProperty]
-        private bool _isRefreshView;
+
         [RelayCommand]
         private async Task RefreshPostAsync()
         {
             try
             {
-                
-                _startIndex = 0; // Reset the start index to fetch from the beginning
-                await FetchPostAsync(); // Reuse the existing FetchPostAsync method
+                _startIndex = 0; // Reset lại để fetch từ đầu
+                await FetchPostAsync();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"🚨 [RefreshPostAsync] Error during refresh: {ex.Message}");
-                await ShowErrorAlertAsync("Unable to refresh posts.");
+                Debug.WriteLine($"🚨 [RefreshPostAsync] Lỗi khi refresh: {ex.Message}");
+                await ShowErrorAlertAsync("Không thể làm mới bài viết.");
             }
             finally
             {
-                IsRefreshView = false; // Reset the refresh state
+                IsRefreshView = false; // Reset trạng thái pull-to-refresh
             }
         }
-        [ObservableProperty]
-        private bool _isThereNewNotification;
-        private void ConfigureRealTimeUpdates()
-        {
-            _realTimeUpdatesService.AddPostChangeAction(nameof(HomeViewModels), OnPostChange);
-            _realTimeUpdatesService.AddPostDeleteAction(nameof(HomeViewModels), OnPostDeleted);
-            //_realTimeUpdatesService.AddPostLikeAction(nameof(HomeViewModels), PostLiked);
-            //_realTimeUpdatesService.AddPostUnLikeAction(nameof(HomeViewModels), PostUnLiked);
-            //_realTimeUpdatesService.AddPostBookmarkAction(nameof(HomeViewModels), PostBookmarked);
-            //_realTimeUpdatesService.AddPostUnBookmarkAction(nameof(HomeViewModels), PostUnBookmarked);
-            //_realTimeUpdatesService.AddCommentAddedAction(nameof(HomeViewModels), CommentAdded);
-            _realTimeUpdatesService.AddUserPhotoChangeAction(nameof(HomeViewModels), OnUserPhotoChanged);
-            _realTimeUpdatesService.AddNotificationGeneratedAction(nameof(HomeViewModels), OnNotificationGenerated);
-        }
 
-        #region Methods
+        #endregion
 
-        /// <summary>
-        /// Điều hướng đến trang thông báo.
-        /// </summary>
-        /// <returns>Task hoàn thành khi điều hướng xong.</returns>
+        #region Navigation
+
         [RelayCommand]
         private async Task NavigateToNotificationAsync()
         {
             try
             {
                 await NavigationAsync("//NotificationPage");
-                
             }
             catch (Exception ex)
             {
-                
                 await ShowErrorAlertAsync("Không thể điều hướng đến trang thông báo.");
             }
         }
 
-        /// <summary>
-        /// Điều hướng đến trang tạo bài viết.
-        /// </summary>
-        /// <returns>Task hoàn thành khi điều hướng xong.</returns>
         [RelayCommand]
         private async Task NavigateToCreatePostAsync()
         {
@@ -134,15 +114,11 @@ namespace SocialApp.App.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"🚨 [NavigateToCreatePostAsync] Lỗi khi điều hướng: {ex.Message}");
+                Debug.WriteLine($"🚨 [NavigateToCreatePostAsync] Lỗi: {ex.Message}");
                 await ShowErrorAlertAsync("Không thể điều hướng đến trang tạo bài viết.");
             }
         }
 
-        /// <summary>
-        /// Điều hướng đến trang cá nhân và hiển thị thông báo.
-        /// </summary>
-        /// <returns>Task hoàn thành khi điều hướng xong.</returns>
         [RelayCommand]
         private async Task NavigateToProfileAsync()
         {
@@ -154,15 +130,11 @@ namespace SocialApp.App.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"🚨 [NavigateToProfileAsync] Lỗi khi điều hướng: {ex.Message}");
+                Debug.WriteLine($"🚨 [NavigateToProfileAsync] Lỗi: {ex.Message}");
                 await ShowErrorAlertAsync("Không thể điều hướng đến trang cá nhân.");
             }
         }
 
-        /// <summary>
-        /// Điều hướng đến trang chi tiết bài viết.
-        /// </summary>
-        /// <returns>Task hoàn thành khi điều hướng xong.</returns>
         [RelayCommand]
         private async Task NavigateToPostDetailAsync()
         {
@@ -173,10 +145,23 @@ namespace SocialApp.App.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"🚨 [NavigateToPostDetailAsync] Lỗi khi điều hướng: {ex.Message}");
+                Debug.WriteLine($"🚨 [NavigateToPostDetailAsync] Lỗi: {ex.Message}");
                 await ShowErrorAlertAsync("Không thể điều hướng đến trang chi tiết bài viết.");
             }
         }
+
+        #endregion
+
+        #region Real-time Events
+
+        public void ConfigureRealTimeUpdates()
+        {
+            _realTimeUpdatesService.AddPostChangeAction(nameof(HomeViewModels), OnPostChange);
+            _realTimeUpdatesService.AddPostDeleteAction(nameof(HomeViewModels), OnPostDeleted);
+            _realTimeUpdatesService.AddUserPhotoChangeAction(nameof(HomeViewModels), OnUserPhotoChanged);
+            _realTimeUpdatesService.AddNotificationGeneratedAction(nameof(HomeViewModels), OnNotificationGenerated);
+        }
+
         private void OnPostChange(PostDto post)
         {
             var currentPost = Posts.FirstOrDefault(p => p.PostId == post.PostId);
@@ -190,6 +175,7 @@ namespace SocialApp.App.ViewModels
                 Posts.Insert(0, PostModel.FromDto(post));
             }
         }
+
         private void OnPostDeleted(Guid postId)
         {
             var post = Posts.FirstOrDefault(p => p.PostId == postId);
@@ -199,35 +185,6 @@ namespace SocialApp.App.ViewModels
                 _startIndex--;
             }
         }
-        //private void OnPostLiked(Guid postId, Guid userId)
-        //{
-        //    var post = Posts.FirstOrDefault(p => p.PostId == postId);
-        //    post?.LikedUserIds.Add(userId);
-        //}
-
-        //private void OnPostUnLiked(Guid postId, Guid userId)
-        //{
-        //    var post = Posts.FirstOrDefault(p => p.PostId == postId);
-        //    post?.LikedUserIds.Remove(userId);
-        //}
-
-        //private void OnPostBookmarked(Guid postId, Guid userId)
-        //{
-        //    var post = Posts.FirstOrDefault(p => p.PostId == postId);
-        //    post?.BookmarkedUserIds.Add(userId);
-        //}
-
-        //private void OnPostUnBookmarked(Guid postId, Guid userId)
-        //{
-        //    var post = Posts.FirstOrDefault(p => p.PostId == postId);
-        //    post?.BookmarkedUserIds.Remove(userId);
-        //}
-
-        //private void OnCommentAdded(CommentDto comment)
-        //{
-        //    var post = Posts.FirstOrDefault(p => p.PostId == comment.PostId);
-        //    post?.Comments.Add(comment); // giả sử `post.Comments` là một danh sách
-        //}
 
         private void OnUserPhotoChanged(UserPhotoChange change)
         {
@@ -237,12 +194,33 @@ namespace SocialApp.App.ViewModels
             }
         }
 
-        private void OnNotificationGenerated(NotificationDto notification) 
-        => IsThereNewNotification = true;
-            // Ghi lại thông báo vào danh sách thông báo của người dùng
-            // Hoặc thực hiện các hành động khác tùy theo yêu cầu
-        
+        private void OnNotificationGenerated(NotificationDto notification)
+        {
+            if (notification.ForUserId == _authService.User.ID)
+            {
+                IsThereNewNotification = true;
+            }
+        }
 
-    #endregion
-}
+        #endregion
+
+        #region Helpers
+
+        private async Task NavigationAsync(string route)
+        {
+            // Logic điều hướng nếu có thêm xử lý
+        }
+
+        private async Task ShowErrorAlertAsync(string message)
+        {
+            // Logic hiển thị cảnh báo
+        }
+
+        private async Task ToastAsync(string message)
+        {
+            // Logic hiện thông báo nhanh
+        }
+
+        #endregion
+    }
 }

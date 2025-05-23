@@ -277,6 +277,7 @@ namespace SocialApp.Api.Services
                 {
                     File.Delete(path);
                 }
+               
             }
             catch (IOException ex)
             {
@@ -489,7 +490,10 @@ namespace SocialApp.Api.Services
                     return ApiResult.Fail("You can delete your own posts only"); // Chỉ cho phép xóa bài viết của chính mình
 
                 // Xóa bài viết khỏi cơ sở dữ liệu
-                _dataContext.Posts.Remove(post);
+                //_dataContext.Posts.Remove(post);
+                SafeDeleteFile(post.PhotoPath); // Xóa ảnh liên quan đến bài viết
+                post.IsDeleted = true;
+                _dataContext.Posts.Update(post);
                 await _dataContext.SaveChangesAsync(); // Lưu thay đổi
                 await _hubContext.Clients.All.PostDelete(postId);
                 return ApiResult.Success(); // Trả về kết quả thành công

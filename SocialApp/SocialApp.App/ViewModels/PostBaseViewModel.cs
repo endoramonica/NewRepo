@@ -15,6 +15,16 @@ public partial class PostBaseViewModel:BaseViewModel
         PostApi = postApi;
     }
     protected bool SkipGoToDetailsPage { get; set; }
+    protected virtual void OnToggleBookmarkedAsync(PostModel postModel)
+    {
+        // This method can be overridden in derived classes to handle the toggle bookmark action
+        // For example, you can update the UI or perform additional actions here
+    }
+    protected virtual void OnToggleLikedAsync(PostModel postModel)
+    {
+        // This method can be overridden in derived classes to handle the toggle bookmark action
+        // For example, you can update the UI or perform additional actions here
+    }
 
     [RelayCommand]
     private async Task GoToPostDetailsPageAsync(PostModel post)
@@ -45,6 +55,7 @@ public partial class PostBaseViewModel:BaseViewModel
                 post.IsLiked = originalState;
                 return;
             }
+            OnToggleLikedAsync(post);
         });
     }
     [RelayCommand]
@@ -61,6 +72,8 @@ public partial class PostBaseViewModel:BaseViewModel
                 post.IsBookmarked = originalState;
                 return;
             }
+            OnToggleBookmarkedAsync(post);
+
         });
     }
 
@@ -144,7 +157,7 @@ public partial class PostBaseViewModel:BaseViewModel
 
     }
     
-    public void Depose()
+    public void Dipose()
     {
         _httpClient?.Dispose();
         // clean up the download local.caches load photos 
@@ -157,8 +170,8 @@ public partial class PostBaseViewModel:BaseViewModel
             }
         }
     }
-    
-    }
+   
+}
 
 
 
