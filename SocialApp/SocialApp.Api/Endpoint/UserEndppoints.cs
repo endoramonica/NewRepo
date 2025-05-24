@@ -50,6 +50,10 @@ namespace SocialApp.Api.Endpoint
                 Results.Ok(await userService.GetUserLikedPostsAsync(startIndex, pageSize, principal.GetUserId())))
                 .Produces<PostDto[]>()
                 .WithName("GetUserLikedPosts");
+            userGroup.MapGet("/notifications", async (int startIndex, int pageSize, [FromServices] UserService userService, ClaimsPrincipal principal) =>
+                Results.Ok(await userService.GetNotificationsAsync(startIndex, pageSize, principal.GetUserId())))
+                .Produces<NotificationDto[]>()
+                .WithName("GetNotifications");
 
             return app;
         }

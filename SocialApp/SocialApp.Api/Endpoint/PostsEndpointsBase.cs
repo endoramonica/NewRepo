@@ -79,6 +79,11 @@ ClaimsPrincipal principal) =>
                 Results.Ok(await postService.GetPostsAsync(startIndex, pageSize, principal.GetUserId())))
                 .Produces<PostDto[]>(StatusCodes.Status200OK)
                 .WithName("GetPosts");
+            // Endpoint để lấy danh sách bài viết  với postid (GET: /api/posts/)
+            postsGroup.MapGet("/{postId:guid}", async (Guid postId, PostService postService, ClaimsPrincipal principal) =>
+                Results.Ok(await postService.GetPostAsync(postId, principal.GetUserId())))
+                .Produces<PostDto>(StatusCodes.Status200OK)
+                .WithName("GetPostsById");
 
             // Endpoint để lưu hoặc cập nhật bình luận cho bài viết (POST: /api/posts/{postId}/comments)
             postsGroup.MapPost("/{postId:guid}/comments", async (Guid postId, SaveCommentDto dto, PostService postService, ClaimsPrincipal principal) =>

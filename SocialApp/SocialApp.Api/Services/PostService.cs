@@ -356,6 +356,18 @@ namespace SocialApp.Api.Services
 
             return posts;
         }
+        public async Task<PostDto?> GetPostAsync(Guid postId , Guid currentUserId)
+        {
+            var posts = await _dataContext.Set<PostDto>()
+                .FromSqlInterpolated($"EXEC GetPostById  @PostId={postId}, @CurrentUserId = {currentUserId}")
+                .ToArrayAsync();
+
+            if (posts.Length == 0)
+            {
+                return null;
+            }
+            return posts[0];
+        }
         //#19 Lưu bình luận cho bài đăng
         public async Task<ApiResult<CommentDto>> SaveCommentAsync(SaveCommentDto dto, LoggedInUser currentUser)
         {

@@ -23,6 +23,8 @@ public interface IPostApi
 
     [Get("/api/posts")]
     Task<PostDto[]> GetPostsAsync(int startIndex, int pageSize);
+    [Get("/api/posts/{postId}")]
+    Task<PostDto?> GetPostAsync(Guid postId);
     [Post("/api/posts/{postId}/comments")]
     Task<ApiResult<CommentDto>> SaveCommentAsync(Guid postId, SaveCommentDto dto);
 

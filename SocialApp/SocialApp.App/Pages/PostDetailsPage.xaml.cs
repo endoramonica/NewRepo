@@ -17,7 +17,9 @@ namespace SocialApp.App.Pages
             _detailsViewModel = detailsViewModel;
             _realTimeUpdatesService = realTimeUpdatesService;
         }
-
+#if IOS
+           // var topSafeArea = UIkit.UIApplication.SharedApplication.Delegate.GetWindows().SafeAreaInsets.Top;
+#endif
         protected override void OnAppearing()
         {
             base.OnAppearing();

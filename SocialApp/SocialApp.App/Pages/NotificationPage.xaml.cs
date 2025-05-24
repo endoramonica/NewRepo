@@ -1,30 +1,21 @@
-﻿namespace SocialApp.App.Pages;
+﻿using CommunityToolkit.Mvvm.Input;
+using SocialApp.App.Services;
+using SocialApp.App.ViewModels;
+
+namespace SocialApp.App.Pages;
 
 public partial class NotificationPage : ContentPage
 {
-	public NotificationPage()
-	{
-		InitializeComponent();
-        List<NotificationModel> notifications = [
-    new NotificationModel(DateTime.Now, "This person liked your post"),
-    new NotificationModel(DateTime.Now.AddDays(-1), "This person commented your post"),
-    new NotificationModel(DateTime.Now, "This person bookmarked your post"),
-    new NotificationModel(DateTime.Now.AddMinutes(50), "This person liked your post"),
-    new NotificationModel(DateTime.Now, "This person liked your post"),
-    new NotificationModel(DateTime.Now.AddMonths(-5), "This person liked your post"),
-    new NotificationModel(DateTime.Now, "This person liked your post"),
-    new NotificationModel(DateTime.Now, "This person liked your post"),
-    new NotificationModel(DateTime.Now, "This person liked your post"),
-    new NotificationModel(DateTime.Now, "This person liked your post"),
-    new NotificationModel(DateTime.Now, "This person liked your post"),
-    new NotificationModel(DateTime.Now, "This person liked your post"),
-    new NotificationModel(DateTime.Now, "This person liked your post"),
-    new NotificationModel(DateTime.Now, "This person liked your post"),
-];
+    private readonly NotificationViewModel _notification;
+    private readonly RealTimeUpdatesService _realTimeUpdatesService;
 
-        collection.ItemsSource = notifications;
+    public NotificationPage(NotificationViewModel notification, RealTimeUpdatesService realTimeUpdatesService)
+    {
+        InitializeComponent();
+        BindingContext = notification;
+        _notification = notification;
+        _realTimeUpdatesService = realTimeUpdatesService;
     }
-
     private  async void ToolbarItem_Clicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("//HomePage", animate: true);
@@ -40,11 +31,16 @@ public partial class NotificationPage : ContentPage
             this.TranslateTo(0, 0, 600, Easing.CubicOut), // Trượt lên
             this.FadeTo(1, 600) // Làm mờ dần
         );
+        _notification.ConfigureRealTimeUpdates();
     }
-
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _realTimeUpdatesService.RemoveHandler(nameof(NotificationViewModel));
+    }
     public record NotificationModel(DateTime On , string Text)
 	{
        
 	}
-
+    
 }

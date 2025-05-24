@@ -90,6 +90,20 @@ namespace SocialApp.Api.Services
 
             return posts;
         }
-
+        public async Task<NotificationDto[]>GetNotificationsAsync(int startIndex, int pageSize, Guid currentUserId) =>
+        
+             await _dataContext.Notifications
+                .Where(n => n.ForUserId == currentUserId)
+                .OrderByDescending(n => n.When)
+                .Skip(startIndex)
+                .Take(pageSize)
+                .Select(n => new NotificationDto
+                (
+                    n.ForUserId,
+                    n.Text,
+                    n.When,
+                    n.PostId ))
+    
+                .ToArrayAsync();
+        }
     }
-}

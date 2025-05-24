@@ -44,6 +44,7 @@ namespace SocialApp.App
             builder.Services.AddTransient<SavePostViewModel>().AddTransient<CreatePostPage>();
             builder.Services.AddTransient<DetailsViewModel>().AddTransient<PostDetailsPage>();
             builder.Services.AddTransient<ProfileViewModel>().AddTransient<Profile>();
+            builder.Services.AddTransient<NotificationViewModel>().AddTransient<NotificationPage>();
 
             builder.Services.AddTransient<InitPage>();
             builder.Services.AddSingleton<IAppPreferences, AppPreferences>();
