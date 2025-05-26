@@ -19,6 +19,7 @@ public class RealTimeUpdatesService
     private readonly Dictionary<string, Action<CommentDto>> _commentAddedActions = new Dictionary<string, Action<CommentDto>>();
     private readonly Dictionary<string, Action<UserPhotoChange>> _userPhotoChangeActions = new Dictionary<string, Action<UserPhotoChange>>();
     private readonly Dictionary<string, Action<NotificationDto>> _notificationActions = new Dictionary<string, Action<NotificationDto>>();
+    private readonly Dictionary<string, Action<FollowNotificationDto>> _followNotificationActions = new Dictionary<string, Action<FollowNotificationDto>>();
     private HubConnection? _hubConnection;
 
     public RealTimeUpdatesService()
@@ -52,7 +53,8 @@ public class RealTimeUpdatesService
 
     public void AddNotificationGeneratedAction(string key, Action<NotificationDto> action)
         => _notificationActions[key] = action;
-
+    public void AddFollowNotificationAction(string key, Action<FollowNotificationDto> action) // Thêm mới
+            => _followNotificationActions[key] = action;
     private void InvokeActions<T>(Dictionary<string, Action<T>> actions, T arg)
     {
         if (actions == null || arg == null)
@@ -141,7 +143,10 @@ public class RealTimeUpdatesService
             {
                 InvokeActions(_notificationActions, notification);
             });
-
+            _hubConnection.On<FollowNotificationDto>(nameof(ISocialHubClient.FollowNotification), notification => // Thêm mới
+            {
+                InvokeActions(_followNotificationActions, notification);
+            });
             await _hubConnection.StartAsync();
         }
         catch (Exception ex)
@@ -165,6 +170,7 @@ public class RealTimeUpdatesService
         _commentAddedActions.Remove(key);
         _userPhotoChangeActions.Remove(key);
         _notificationActions.Remove(key);
+        _followNotificationActions.Remove(key);
     }
 }
 

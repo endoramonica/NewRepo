@@ -45,6 +45,7 @@ namespace SocialApp.App
             builder.Services.AddTransient<DetailsViewModel>().AddTransient<PostDetailsPage>();
             builder.Services.AddTransient<ProfileViewModel>().AddTransient<Profile>();
             builder.Services.AddTransient<NotificationViewModel>().AddTransient<NotificationPage>();
+            builder.Services.AddTransient<FollowViewModel>().AddTransient<FollowPage>();
 
             builder.Services.AddTransient<InitPage>();
             builder.Services.AddSingleton<IAppPreferences, AppPreferences>();
@@ -68,6 +69,9 @@ namespace SocialApp.App
                 .ConfigureHttpClient(SetHttpClient);
 
             services.AddRefitClient<IUserApi>(GetRefitSettings)
+                .ConfigureHttpClient(SetHttpClient);
+
+            services.AddRefitClient<IFollowApi>(GetRefitSettings)
                 .ConfigureHttpClient(SetHttpClient);
 
             void SetHttpClient(HttpClient httpClient)

@@ -8,6 +8,7 @@
              Title="CropImagePage">
     <Grid RowDefinitions="Auto , *">
         <imageEditor:SfImageEditor 
+                           Grid.Row="0"
                           x:Name="imageEditor"
                           ShowToolbar="False"
                           HeightRequest="400"
@@ -15,8 +16,16 @@
                           HorizontalOptions="Center"
                           VerticalOptions="Center"/>
         <Grid Grid.Row="1" ColumnDefinitions="auto,*,auto">
-                <Button Grid.Column="0" Text="Cancel" HorizontalOptions="Center" VerticalOptions="Center" Clicked="Cancel_Click"/>
-                <Button Grid.Column="2" Text="Accepts" HorizontalOptions="Center" VerticalOptions="Center" Clicked="AcceptChanges_Click"/>
+                <Button Grid.Column="0" 
+                        Text="Cancel" 
+                        HorizontalOptions="Center" 
+                        VerticalOptions="Center"
+                        Clicked="Cancel_Click"/>
+                <Button Grid.Column="2" 
+                        Text="Accepts" 
+                        HorizontalOptions="Center" 
+                        VerticalOptions="Center"
+                        Clicked="AcceptChanges_Click"/>
             </Grid>
     </Grid>
 </ContentPage>

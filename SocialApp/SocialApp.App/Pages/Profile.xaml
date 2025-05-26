@@ -43,7 +43,7 @@
                         <Grid WidthRequest="50" HeightRequest="50">
                             <!-- Border chứa ảnh -->
                             <Border StrokeShape="RoundRectangle 45" Stroke="LightGray" Padding="0">
-                                <Image HeightRequest="60" WidthRequest="60" Source="{Binding User.DisplayPhotoUrl}" Aspect="AspectFit">
+                                <Image HeightRequest="60" WidthRequest="60" Source="{Binding DisplayPhotoUrl}" Aspect="AspectFit">
                                     <Image.Clip>
                                         <EllipseGeometry Center="30,30" RadiusX="30" RadiusY="30"/>
                                     </Image.Clip>
@@ -65,7 +65,16 @@
                                     Margin="2"/>        
                         </Grid>
 
-                        <Button Text="Theo dõi" WidthRequest="100" HeightRequest="30" BackgroundColor="Black" TextColor="White" Margin="10,0,0,0"/>
+                        <Button IsVisible="{Binding IsOwner}"
+                                Command="{Binding FollowViewModel.FollowCommand}"
+                            CommandParameter="{Binding TargetUser.ID}"
+                                Text="Theo dõi"
+                                WidthRequest="100" 
+                                HeightRequest="30" 
+                                BackgroundColor="Black" 
+                                TextColor="White"
+                                
+                                Margin="10,0,0,0"/>
                     </HorizontalStackLayout>
                 </Grid>
 

@@ -17,10 +17,10 @@ namespace SocialApp.App.Models
         [ObservableProperty ,NotifyPropertyChangedFor(nameof(UserPhoto))]
         private string? _userPhotoUrl;
         public string UserPhoto => string.IsNullOrWhiteSpace(UserPhotoUrl) ? "add_a_photo.png" : UserPhotoUrl;
-        [ObservableProperty]
-        public string? _content;
-        [ObservableProperty]
-        public string? _photoUrl;
+        
+        public string? Content { get; set; }
+       
+        public string? PhotoUrl { get; set; }                   
         public DateTime PostedOn { get; set; }
         public DateTime? ModifiedOn { get; set; }
 

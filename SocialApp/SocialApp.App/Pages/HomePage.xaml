@@ -11,14 +11,12 @@
 
     <!-- Phần TitleView của Shell -->
     <Shell.TitleView>
-        <Grid ColumnDefinitions="Auto, *, Auto" Padding="10,0">
-
+        <Grid ColumnDefinitions="*, Auto" Padding="10,0" VerticalOptions="Center">
             <!-- Tiêu đề trang -->
             <Label Text="Home" FontSize="22" FontAttributes="Bold" VerticalOptions="Center" />
 
-            <!-- Phần chứa các icon bên phải -->
-            <Grid Grid.Column="2" ColumnDefinitions="Auto, Auto, Auto" Padding="10" ColumnSpacing="10" HorizontalOptions="End">
-
+            <!-- Các icon bên phải -->
+            <Grid Grid.Column="1" ColumnDefinitions="Auto, Auto, Auto, Auto" ColumnSpacing="10" HorizontalOptions="End" Padding="10,0">
                 <!-- Icon thông báo với badge -->
                 <Grid Grid.Column="0">
                     <Image Source="notifications.png" HeightRequest="24" WidthRequest="24" VerticalOptions="Center" HorizontalOptions="Center">
@@ -26,7 +24,9 @@
                             <TapGestureRecognizer Command="{Binding NavigateToNotificationCommand}" />
                         </Image.GestureRecognizers>
                     </Image>
-                    <Ellipse Fill="Yellow" WidthRequest="12" HeightRequest="12" Stroke="Red" StrokeThickness="2" VerticalOptions="Start" HorizontalOptions="End" Margin="2" IsVisible="{Binding IsThereNewNotification }"/>
+                    <Ellipse Fill="Yellow" WidthRequest="12" HeightRequest="12" Stroke="Red" StrokeThickness="2" 
+                         VerticalOptions="Start" HorizontalOptions="End" Margin="2" 
+                         IsVisible="{Binding IsThereNewNotification}"/>
                 </Grid>
 
                 <!-- Icon thêm -->
@@ -42,9 +42,17 @@
                         <TapGestureRecognizer Command="{Binding NavigateToProfileCommand}" />
                     </Image.GestureRecognizers>
                 </Image>
+
+                <!-- Icon ngôi sao -->
+                <Image Grid.Column="3" Source="ngoisao.png" HeightRequest="30" WidthRequest="30" VerticalOptions="Center">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateToFollowCommand}" />
+                    </Image.GestureRecognizers>
+                </Image>
             </Grid>
         </Grid>
     </Shell.TitleView>
+
 
     <!--Bên trong Board -->
     <RefreshView Command="{Binding RefreshPostCommand}" IsRefreshing="{Binding IsRefreshView}">

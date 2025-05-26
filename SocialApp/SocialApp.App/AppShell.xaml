@@ -51,6 +51,9 @@
                   ContentTemplate="{DataTemplate pages:Profile}" />
 
 
+    <ShellContent Route="FollowPage"
+                  ContentTemplate="{DataTemplate pages:FollowPage}" />
+
 
 
 

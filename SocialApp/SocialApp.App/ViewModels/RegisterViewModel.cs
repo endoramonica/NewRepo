@@ -67,7 +67,7 @@ public partial class RegisterViewModel : BaseViewModel
             }
 
             await ToastAsync("Đăng ký thành công");
-            await NavigationAsync("//loginPage");
+            await NavigationAsync("//LoginPage");
         });
     }
 

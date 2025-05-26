@@ -88,6 +88,9 @@
 	  <MauiXaml Update="Pages\CropImagePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\FollowPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Templates\PostImage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

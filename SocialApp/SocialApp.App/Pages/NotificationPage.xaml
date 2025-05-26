@@ -1,87 +1,76 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SocialApp.App.Pages.NotificationPage"
-             BackgroundColor="LightGrey"
              xmlns:vm="clr-namespace:SocialApp.App.ViewModels"
-             x:DataType="vm:NotificationViewModel"   
+             x:Class="SocialApp.App.Pages.NotificationPage"
+             x:DataType="vm:NotificationViewModel"
+             xmlns:dtos="clr-namespace:SocialAppLibrary.Shared.Dtos;assembly=SocialAppLibrary.Shared"
+             BackgroundColor="LightGrey"
              Title="NotificationPage">
 
     <!-- Toolbar -->
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="back" IconImageSource="home.png" Priority="0" Order="Default" Clicked="ToolbarItem_Clicked" />
+        <ToolbarItem Text="Back" 
+                     IconImageSource="home.png" 
+                     Priority="0" 
+                     Order="Default" 
+                     Clicked="ToolbarItem_Clicked" />
     </ContentPage.ToolbarItems>
 
-    <VerticalStackLayout>
-        <!-- Header với Tabs -->
-        <Border StrokeThickness="0" BackgroundColor="#f0f2f5" Padding="10">
-            <Grid ColumnDefinitions="*, Auto">
-                <Label Text="Notifications" FontSize="20" FontAttributes="Bold"/>
-                <HorizontalStackLayout Grid.Column="1">
-                    <!-- Tab: All -->
-                    <VerticalStackLayout>
-                        <Label Text="All" FontAttributes="Bold"
-                               TextColor="{Binding SelectedTab, Converter={StaticResource TabColorConverter}, ConverterParameter='All'}">
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ChangeTabCommand}" CommandParameter="All"/>
-                            </Label.GestureRecognizers>
-                        </Label>
-                        <BoxView BackgroundColor="Blue" HeightRequest="2"
-                                 IsVisible="{Binding SelectedTab, Converter={StaticResource TabUnderlineConverter}, ConverterParameter='All'}"/>
-                    </VerticalStackLayout>
+    <RefreshView Command="{Binding RefreshNotificationsCommand}" 
+                 IsRefreshing="{Binding IsRefreshing}">
+        <Grid>
+            <CollectionView ItemsSource="{Binding Notifications}"
+                            RemainingItemsThreshold="5"
+                            RemainingItemsThresholdReachedCommand="{Binding FetchNotificationsCommand}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="dtos:NotificationDto">
+                        <Border Margin="0,5"
+                                Padding="10"
+                                BackgroundColor="FloralWhite"
+                                
+                            >
+                            <HorizontalStackLayout Spacing="10" Padding="10">
+                                <!-- Avatar tròn -->
+                                <Grid WidthRequest="40" HeightRequest="40">
+                                    <Image 
+                                    Source="{Binding DisplayPhotoUrl}"
+                                    Aspect="AspectFill"
+                                    WidthRequest="40"
+                                    HeightRequest="40"
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="Center">
+                                        <Image.Clip>
+                                            <EllipseGeometry Center="20,20" RadiusX="20" RadiusY="20" />
+                                        </Image.Clip>
+                                    </Image>
+                                </Grid>
 
-                    <!-- Tab: Unread -->
-                    <VerticalStackLayout Margin="20,0,0,0">
-                        <Label Text="Unread"
-                               TextColor="{Binding SelectedTab, Converter={StaticResource TabColorConverter}, ConverterParameter='Unread'}">
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ChangeTabCommand}" CommandParameter="Unread"/>
-                            </Label.GestureRecognizers>
-                        </Label>
-                        <BoxView BackgroundColor="Blue" HeightRequest="2"
-                                 IsVisible="{Binding SelectedTab, Converter={StaticResource TabUnderlineConverter}, ConverterParameter='Unread'}"/>
-                    </VerticalStackLayout>
-                </HorizontalStackLayout>
-            </Grid>
-        </Border>
+                                <!-- Nội dung bên phải -->
+                                <VerticalStackLayout VerticalOptions="Center">
+                                    <Label 
+                                    FontSize="12" 
+                                    TextColor="Gray" 
+                                    Text="{Binding When, StringFormat='{0:hh:mm tt dd MMM yyyy}'}"
+                                    LineBreakMode="TailTruncation" />
 
-        <!-- Danh sách thông báo -->
-        <CollectionView x:Name="collection">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <!-- Mỗi mục thông báo có viền riêng -->
-                    <Border StrokeThickness="1"
-                            Stroke="LightGray"
-                            BackgroundColor="White"
-                            Padding="10"
-                            Margin="0,5,0,5"
-                            StrokeShape="RoundRectangle 10">
-                        <Grid ColumnDefinitions="Auto, *, Auto">
-                            <Image Source="{Binding ImageSource}"
-                                   WidthRequest="40"
-                                   HeightRequest="40"
-                                   Margin="0,0,10,0"/>
+                                    <Label 
+                                    Text="{Binding Text}" 
+                                    FontSize="14"
+                                    TextColor="Black"
+                                    LineBreakMode="WordWrap" />
+                                 </VerticalStackLayout>
+                            </HorizontalStackLayout>
 
-                            <VerticalStackLayout Grid.Column="1">
-                                <Label Text="{Binding On, StringFormat='{0:hh:mm tt dd/MM/yyyy}'}" TextColor="Gray"/>
-                                <Label Text="{Binding Text}" FontAttributes="Bold"/>
-                            </VerticalStackLayout>
 
-                            <!-- Hiển thị dấu chấm xanh nếu là thông báo chưa đọc -->
-                            <BoxView Grid.Column="2"
-                                     WidthRequest="8"
-                                     HeightRequest="8"
-                                     BackgroundColor="Blue"
-                                     CornerRadius="4"
-                                     VerticalOptions="Start"
-                                     HorizontalOptions="End"
-                                     Margin="0,3,3,0"
-                                     IsVisible="{Binding IsUnread}"/>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-
-    </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <ActivityIndicator  
+                               IsRunning="{Binding IsBusy}" 
+                               VerticalOptions="Center" 
+                               HorizontalOptions="Center" />
+        </Grid>
+    </RefreshView>
 </ContentPage>
