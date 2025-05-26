@@ -444,7 +444,8 @@ namespace SocialApp.Api.Services
                         postExistsOwnerId,
                         $"{currentUser.Name} commented on your post",
                         DateTime.Now,
-                        dto.PostId
+                        dto.PostId,
+                        currentUser.PhotoUrl
                     );
                     await SaveNotificationAsync(notification);
                     await _hubContext.Clients.All.PostCommentAdded(commentDto);
@@ -555,7 +556,8 @@ namespace SocialApp.Api.Services
                     postExistsOwnerId,
                     $"{currentUser.Name} saved your post",
                     DateTime.Now,
-                    postId
+                    postId,
+                    currentUser.PhotoUrl
 
                     );
                     await SaveNotificationAsync(notificationDto);
@@ -606,7 +608,8 @@ namespace SocialApp.Api.Services
                     postExistsOwnerId,
                     $"{currentUser.Name} liked your post",
                     DateTime.Now,
-                    postId
+                    postId,
+                    currentUser.PhotoUrl
 
                     );
                     await SaveNotificationAsync(notificationDto);

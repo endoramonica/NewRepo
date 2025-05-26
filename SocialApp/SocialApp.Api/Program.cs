@@ -35,8 +35,9 @@ if (string.IsNullOrEmpty(connectionString))
 builder.Services.AddTransient<AuthService>();
 builder.Services.AddTransient<PostService>();
 builder.Services.AddTransient<UserService>();
+builder.Services.AddTransient<FollowService>();
 builder.Services.AddTransient<PhotoUploadService>();
-
+builder.Services.AddScoped<IFollowService, FollowService>();
 builder.Services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
 
 //#23 Thêm dịch vụ Authentication (Xác thực) vào DI container
@@ -131,6 +132,7 @@ app.UseAntiforgery(); // ✅ ở đây
 app.MapAuthEndpoints();
 app.MapPostsEndpoints();
 app.MapUserEndpoints();
+app.MapFollowEndpoints();
 
 app.UseStaticFiles();
 app.MapHub<SocialApp.Api.Hubs.SocialHubs>(AppConstants.HubPattern);

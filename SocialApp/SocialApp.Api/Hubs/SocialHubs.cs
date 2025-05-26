@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using SocialAppLibrary.Shared.Dtos;
 using SocialAppLibrary.Shared.IHub;
 
 namespace SocialApp.Api.Hubs
@@ -19,6 +20,10 @@ namespace SocialApp.Api.Hubs
         {
             // Handle when a client sends a message
            
+        }
+        public async Task FollowNotification(FollowNotificationDto notification)
+        {
+            await Clients.User(notification.FollowerId.ToString()).FollowNotification(notification);
         }
     }   
     

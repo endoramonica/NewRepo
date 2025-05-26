@@ -16,5 +16,7 @@ namespace SocialApp.Api.Data.Entities
         [MaxLength(200)]
         public string Text { get; set; }
         
+
+
     }
 }

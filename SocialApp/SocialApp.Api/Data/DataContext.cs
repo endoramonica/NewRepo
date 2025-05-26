@@ -6,7 +6,7 @@ using SocialAppLibrary.Shared.Dtos;
 
 namespace SocialApp.Api.Data
 {
-    public class DataContext : DbContext
+    public partial class DataContext : DbContext
 
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
@@ -19,6 +19,8 @@ namespace SocialApp.Api.Data
         public DbSet<Likes> Likes { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Follow> Follows { get; set; }
+
 
         protected override void OnConfiguring( DbContextOptionsBuilder optionsBuilder)
         {
@@ -76,6 +78,20 @@ namespace SocialApp.Api.Data
                 .HasOne(c => c.Post)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
+            // Cấu hình bảng Follow
+            modelBuilder.Entity<Follow>(e =>
+            {
+                e.HasKey(f => f.Id);
+                e.HasIndex(f => new { f.FollowerId, f.FollowingId }).IsUnique(); // Đảm bảo không có bản ghi trùng
+                e.HasOne(f => f.Follower)
+                 .WithMany()
+                 .HasForeignKey(f => f.FollowerId)
+                 .OnDelete(DeleteBehavior.Restrict); // Không xóa User nếu có Follow
+                e.HasOne(f => f.Following)
+                 .WithMany()
+                 .HasForeignKey(f => f.FollowingId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            });
         }
 
 

@@ -2,6 +2,7 @@
 
 
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using SocialApp.Api.Data;
 using SocialApp.Api.Hubs;
@@ -16,10 +17,10 @@ namespace SocialApp.Api.Services
         private readonly PhotoUploadService _photoUploadService;
         private readonly IHubContext<SocialHubs, ISocialHubClient> _hubContext;
 
-        public UserService( DataContext dataContext , PhotoUploadService photoUploadService, IHubContext<SocialHubs,ISocialHubClient> hubContext) 
-        { 
+        public UserService(DataContext dataContext, PhotoUploadService photoUploadService, IHubContext<SocialHubs, ISocialHubClient> hubContext)
+        {
             _dataContext = dataContext;
-           _photoUploadService = photoUploadService;
+            _photoUploadService = photoUploadService;
             _hubContext = hubContext;
         }
         public async Task<ApiResult<string>> ChangePhotoAsync(IFormFile photo, Guid currentUserId)
@@ -46,7 +47,7 @@ namespace SocialApp.Api.Services
                 // 🔹 5. Cập nhật thông tin user trong database
                 _dataContext.Users.Update(user);
                 await _dataContext.SaveChangesAsync();
-                await _hubContext.Clients.All.UserPhotoChange(new UserPhotoChange ( currentUserId, user.PhotoUrl)); // Gửi thông báo đến tất cả client về việc thay đổi ảnh đại diện của user
+                await _hubContext.Clients.All.UserPhotoChange(new UserPhotoChange(currentUserId, user.PhotoUrl)); // Gửi thông báo đến tất cả client về việc thay đổi ảnh đại diện của user
                 // 🔹 6. Nếu user đã có ảnh trước đó, xóa ảnh cũ khỏi hệ thống
                 if (!string.IsNullOrWhiteSpace(existingPhotoPath) && File.Exists(existingPhotoPath))
                 {
@@ -63,16 +64,16 @@ namespace SocialApp.Api.Services
             }
         }
 
-        public async Task<PostDto[]> GetUserPostsAsync(int startIndex , int pageSize , Guid currentUserId)
+        public async Task<PostDto[]> GetUserPostsAsync(int startIndex, int pageSize, Guid currentUserId)
         {
             // Executes the stored procedure 'GetPosts' to retrieve paginated posts for the user.
             var posts = await _dataContext.Set<PostDto>()
              .FromSqlInterpolated($"EXEC GetUserPosts @StartIndex={startIndex}, @PageSize={pageSize}, @CurrentUserId = {currentUserId}")
              .ToArrayAsync();
 
-                    return posts;
+            return posts;
         }
-        public async Task<PostDto[]> GetUserBookmarkedPostsAsync(int startIndex , int pageSize , Guid currentUserId)
+        public async Task<PostDto[]> GetUserBookmarkedPostsAsync(int startIndex, int pageSize, Guid currentUserId)
         {
             // Executes the stored procedure 'GetBookmarkedPosts' to retrieve paginated bookmarked posts for the user.
             var posts = await _dataContext.Set<PostDto>()
@@ -90,20 +91,24 @@ namespace SocialApp.Api.Services
 
             return posts;
         }
-        public async Task<NotificationDto[]>GetNotificationsAsync(int startIndex, int pageSize, Guid currentUserId) =>
-        
-             await _dataContext.Notifications
+        public async Task<NotificationDto[]> GetNotificationsAsync(int startIndex, int pageSize, Guid currentUserId)
+        {
+            var notifications = await _dataContext.Notifications
                 .Where(n => n.ForUserId == currentUserId)
                 .OrderByDescending(n => n.When)
                 .Skip(startIndex)
                 .Take(pageSize)
-                .Select(n => new NotificationDto
-                (
+                .Select(n => new NotificationDto(
                     n.ForUserId,
                     n.Text,
                     n.When,
-                    n.PostId ))
-    
+                    n.PostId,
+                    n.User.PhotoPath // Giả sử Notification có navigation property User
+                ))
                 .ToArrayAsync();
+
+            return notifications;
         }
+    }
+
     }
