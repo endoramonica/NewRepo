@@ -18,18 +18,24 @@
                   ColumnSpacing="5"
                   Padding="5">
 
+
                 <!-- Avatar -->
                 <Border Grid.Column="0"
                         HeightRequest="40"
                         WidthRequest="40"
                         StrokeShape="RoundRectangle 20"
-                        BackgroundColor="Aqua">
+                        BackgroundColor="WhiteSmoke">
                     <Image Source="{Binding UserPhoto}"
                            WidthRequest="30"
                            HeightRequest="30"
                            VerticalOptions="Center"
                            HorizontalOptions="Center"
-                           Aspect="AspectFit" />
+                           Aspect="AspectFit" >
+                        <Image.Clip>
+                            <EllipseGeometry Center="15,15" RadiusX="15" RadiusY="15"/>
+                        </Image.Clip>
+                    </Image>
+
                 </Border>
 
                 <!-- Thông tin người dùng -->

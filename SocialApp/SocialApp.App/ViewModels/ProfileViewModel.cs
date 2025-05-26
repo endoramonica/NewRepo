@@ -8,6 +8,7 @@ using SocialApp.App.Services;
 using SocialAppLibrary.Shared.Dtos;
 using SocialAppLibrary.Shared.IHub;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace SocialApp.App.ViewModels;
 
@@ -21,7 +22,8 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
 
     public FollowViewModel FollowViewModel { get; }
 
-    public ProfileViewModel(IPostApi postApi, IFollowApi followApi, AuthService authService, IUserApi userApi, RealTimeUpdatesService realTimeUpdatesService) : base(postApi)
+    public ProfileViewModel(IPostApi postApi, IFollowApi followApi, AuthService authService, IUserApi userApi, RealTimeUpdatesService realTimeUpdatesService)
+        : base(postApi)
     {
         _followApi = followApi;
         _authService = authService ?? throw new ArgumentNullException(nameof(authService));
@@ -29,6 +31,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
         _realTimeUpdatesService = realTimeUpdatesService;
         User = _authService.User ?? throw new InvalidOperationException("User must not be null.");
         FollowViewModel = new FollowViewModel(postApi, followApi, userApi, authService, realTimeUpdatesService);
+        Console.WriteLine($"[DEBUG] ProfileViewModel initialized. CropPhotoSource: {CropPhotoSource}");
     }
 
     [ObservableProperty]
@@ -50,7 +53,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(DisplayPhotoUrl))]  // ✅ THÊM: Notify khi User thay đổi
+    [NotifyPropertyChangedFor(nameof(DisplayPhotoUrl))]
     [NotifyPropertyChangedFor(nameof(CurrentUserModel))]
     private LoggedInUser _user;
 
@@ -74,22 +77,14 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
 
     private const int PageSize = 4;
 
-    // ✅ SỬA: Sử dụng tên file ảnh mặc định đúng
     public string DisplayPhotoUrl => string.IsNullOrWhiteSpace(User?.PhotoUrl) ? "add_a_photo.png" : User.PhotoUrl;
 
     public UserModel CurrentUserModel => User != null ? UserModel.FromLoggedInUser(User) : new UserModel();
 
-    // ❌ XÓA: Method này không cần thiết vì đã có NotifyPropertyChangedFor
-    // async partial void OnUserChanged(LoggedInUser? oldValue, LoggedInUser newValue)
-    // {
-    //     OnPropertyChanged(nameof(DisplayPhotoUrl));
-    //     OnPropertyChanged(nameof(CurrentUserModel));
-    // }
-
     [RelayCommand]
     private async Task LogoutAsync()
     {
-        if (await App.Current.MainPage.DisplayAlert("Logout", "Are you sure you want to logout?", "Yes", "No"))
+        if (await App.Current.MainPage.DisplayAlert("Đăng xuất", "Bạn có chắc chắn muốn đăng xuất?", "Có", "Không"))
         {
             _authService.Logout();
             await Shell.Current.GoToAsync("//LoginPage");
@@ -118,7 +113,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
     {
         SelectedTab = ProfileTab.MyPosts;
         _myPostStartIndex = 0;
-        MyPosts.Clear(); // ✅ THÊM: Clear trước khi fetch
+        MyPosts.Clear();
         await FetchMyPostsAsync();
     }
 
@@ -127,7 +122,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
     {
         SelectedTab = ProfileTab.Bookmarked;
         _bookMarkedPostStartIndex = 0;
-        BookMarkedPost.Clear(); // ✅ THÊM: Clear trước khi fetch
+        BookMarkedPost.Clear();
         await FetchBookmarkedPostsAsync();
     }
 
@@ -136,7 +131,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
     {
         SelectedTab = ProfileTab.Liked;
         _likedPostStartIndex = 0;
-        LikedPosts.Clear(); // ✅ THÊM: Clear trước khi fetch
+        LikedPosts.Clear();
         await FetchLikedPostsAsync();
     }
 
@@ -214,6 +209,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
     [RelayCommand]
     private async Task ChangePhotoAsync()
     {
+        Console.WriteLine("[DEBUG] ChangePhotoAsync triggered");
         var selectedPhotoSource = await ChoosePhotoAsync();
         if (!string.IsNullOrWhiteSpace(selectedPhotoSource))
         {
@@ -222,6 +218,11 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
                 [nameof(CropImagePage.PhotoSource)] = selectedPhotoSource
             };
             await Shell.Current.GoToAsync("//CropImagePage", param);
+            Console.WriteLine($"[DEBUG] Navigating to CropImagePage with PhotoSource={selectedPhotoSource}");
+        }
+        else
+        {
+            Console.WriteLine("[DEBUG] No photo selected in ChangePhotoAsync");
         }
     }
 
@@ -230,50 +231,79 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
 
     async partial void OnCropPhotoSourceChanged(string? oldValue, string? newValue)
     {
-        if (!string.IsNullOrWhiteSpace(newValue))
+        Console.WriteLine($"[DEBUG] OnCropPhotoSourceChanged triggered. Old: {oldValue}, New: {newValue}");
+        if (string.IsNullOrWhiteSpace(newValue))
         {
-            await MakeApiCall(async () =>
+            Console.WriteLine("[DEBUG] CropPhotoSource is null or empty");
+            return;
+        }
+
+        if (!File.Exists(newValue))
+        {
+            Console.WriteLine($"[ERROR] File does not exist: {newValue}");
+            await ShowErrorAlertAsync("Tệp ảnh không tồn tại.");
+            return;
+        }
+
+        await MakeApiCall(async () =>
+        {
+            try
             {
+                Console.WriteLine($"[DEBUG] Attempting to read file: {newValue}");
                 var photoName = Path.GetFileName(newValue);
                 using var fs = File.OpenRead(newValue);
                 var photoStreamPart = new StreamPart(fs, photoName);
 
+                Console.WriteLine("[DEBUG] Calling ChangePhotoAsync");
                 var result = await _userApi.ChangePhotoAsync(photoStreamPart);
                 if (!result.IsSuccess)
                 {
+                    Console.WriteLine($"[ERROR] API call failed: {result.Error}");
                     await ShowErrorAlertAsync(result.Error);
                     return;
                 }
 
                 var newPhotoUrl = result.Data;
+                Console.WriteLine($"[DEBUG] New photo URL: {newPhotoUrl}");
 
-                // Cập nhật User - NotifyPropertyChangedFor sẽ tự động notify DisplayPhotoUrl và CurrentUserModel
-                User = User with { PhotoUrl = newPhotoUrl };
-                _authService.Login(new LoginResponse(User, _authService.Token));
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    User = User with { PhotoUrl = newPhotoUrl };
+                    _authService.Login(new LoginResponse(User, _authService.Token));
+                    UpdateUserPhotoInPosts(newPhotoUrl);
+                    Console.WriteLine("[DEBUG] User photo updated in posts");
 
-                // Cập nhật ảnh trong tất cả posts của user hiện tại
-                UpdateUserPhotoInPosts(newPhotoUrl);
-            });
-        }
+                    // Xóa tệp tạm sau khi API thành công
+                    if (File.Exists(newValue))
+                    {
+                        File.Delete(newValue);
+                        Console.WriteLine($"[DEBUG] Deleted temporary file: {newValue}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Exception in OnCropPhotoSourceChanged: {ex.Message}");
+                await ShowErrorAlertAsync(ex.Message);
+            }
+        });
     }
 
     private void UpdateUserPhotoInPosts(string newPhotoUrl)
     {
         var currentUserId = User.ID;
+        Console.WriteLine($"[DEBUG] Updating user photo in posts. UserID: {currentUserId}, NewPhotoUrl: {newPhotoUrl}");
 
-        // Cập nhật trong MyPosts
         foreach (var post in MyPosts.Where(p => p.UserId == currentUserId))
         {
             post.UserPhotoUrl = newPhotoUrl;
         }
 
-        // Cập nhật trong BookMarkedPost nếu là post của user hiện tại
         foreach (var post in BookMarkedPost.Where(p => p.UserId == currentUserId))
         {
             post.UserPhotoUrl = newPhotoUrl;
         }
 
-        // Cập nhật trong LikedPosts nếu là post của user hiện tại
         foreach (var post in LikedPosts.Where(p => p.UserId == currentUserId))
         {
             post.UserPhotoUrl = newPhotoUrl;
@@ -287,6 +317,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
         _realTimeUpdatesService.AddPostChangeAction(nameof(ProfileViewModel), OnPostChange);
         _realTimeUpdatesService.AddPostDeleteAction(nameof(ProfileViewModel), OnPostDeleted);
         _realTimeUpdatesService.AddUserPhotoChangeAction(nameof(ProfileViewModel), OnUserPhotoChanged);
+        Console.WriteLine("[DEBUG] Real-time updates configured");
     }
 
     private void UpdatePostInCollection(ObservableCollection<PostModel> collection, PostDto post)
@@ -297,8 +328,8 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
             existing.Content = post.Content;
             existing.IsBookmarked = post.IsBookmarked;
             existing.IsLiked = post.IsLiked;
-            // ✅ THÊM: Cập nhật thêm các field khác nếu cần
             existing.UserPhotoUrl = post.UserPhotoUrl;
+            Console.WriteLine($"[DEBUG] Updated post {post.PostId} in collection");
         }
     }
 
@@ -312,30 +343,38 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
     private void OnPostDeleted(Guid postId)
     {
         var myPost = MyPosts.FirstOrDefault(p => p.PostId == postId);
-        if (myPost != null) MyPosts.Remove(myPost);
+        if (myPost != null)
+        {
+            MyPosts.Remove(myPost);
+            Console.WriteLine($"[DEBUG] Removed post {postId} from MyPosts");
+        }
 
         var bookmarked = BookMarkedPost.FirstOrDefault(p => p.PostId == postId);
-        if (bookmarked != null) BookMarkedPost.Remove(bookmarked);
+        if (bookmarked != null)
+        {
+            BookMarkedPost.Remove(bookmarked);
+            Console.WriteLine($"[DEBUG] Removed post {postId} from BookMarkedPost");
+        }
 
         var liked = LikedPosts.FirstOrDefault(p => p.PostId == postId);
-        if (liked != null) LikedPosts.Remove(liked);
+        if (liked != null)
+        {
+            LikedPosts.Remove(liked);
+            Console.WriteLine($"[DEBUG] Removed post {postId} from LikedPosts");
+        }
     }
 
     private void OnUserPhotoChanged(UserPhotoChange change)
     {
-        // Nếu là user hiện tại thay đổi ảnh
+        Console.WriteLine($"[DEBUG] OnUserPhotoChanged triggered. UserId: {change.UserId}, NewPhotoUrl: {change.UserPhotoUrl}");
         if (change.UserId == User.ID)
         {
-            // Cập nhật User object - NotifyPropertyChangedFor sẽ tự động notify UI
             User = User with { PhotoUrl = change.UserPhotoUrl };
             _authService.Login(new LoginResponse(User, _authService.Token));
-
-            // Cập nhật trong posts
             UpdateUserPhotoInPosts(change.UserPhotoUrl);
         }
         else
         {
-            // Cập nhật ảnh của user khác trong các posts
             foreach (var post in BookMarkedPost.Where(post => post.UserId == change.UserId))
             {
                 post.UserPhotoUrl = change.UserPhotoUrl;
@@ -344,7 +383,6 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
             {
                 post.UserPhotoUrl = change.UserPhotoUrl;
             }
-            // ✅ SỬA: Thêm cập nhật cho MyPosts nếu có post của user khác
             foreach (var post in MyPosts.Where(post => post.UserId == change.UserId))
             {
                 post.UserPhotoUrl = change.UserPhotoUrl;
@@ -355,11 +393,11 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
     public void Dispose()
     {
         _realTimeUpdatesService?.RemoveHandler(nameof(ProfileViewModel));
-        // ✅ THÊM: Dispose FollowViewModel nếu nó implement IDisposable
         if (FollowViewModel is IDisposable disposableFollowViewModel)
         {
             disposableFollowViewModel.Dispose();
         }
+        Console.WriteLine("[DEBUG] ProfileViewModel disposed");
     }
 
     #endregion
@@ -369,10 +407,10 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
     [RelayCommand]
     private async Task OpenSettingsAsync()
     {
-        await Shell.Current.GoToAsync("//SettingsPage");
+        await Shell.Current.GoToAsync("//HomePage");
+        Console.WriteLine("[DEBUG] Navigating to SettingsPage");
     }
 
-    // ✅ THÊM: Method để refresh tất cả data
     [RelayCommand]
     public async Task RefreshAllDataAsync()
     {
@@ -385,6 +423,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
         LikedPosts.Clear();
 
         await FetchPostsAsync();
+        Console.WriteLine("[DEBUG] Refreshed all data");
     }
 
     #endregion

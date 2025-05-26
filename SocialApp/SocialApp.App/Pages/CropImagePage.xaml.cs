@@ -15,13 +15,14 @@ public partial class CropImagePage : ContentPage, IQueryAttributable
 
     public async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
+        Console.WriteLine("[DEBUG] ApplyQueryAttributes called");
         if (query.TryGetValue(nameof(PhotoSource), out var photoSourceObject)
             && photoSourceObject is string photoSource)
         {
-            // Fixed logic: Check if photoSource is null or empty
             if (string.IsNullOrWhiteSpace(photoSource))
             {
-                await Toast.Make("No photo provided for cropping").Show();
+                Console.WriteLine("[ERROR] No photo provided for cropping");
+                await Toast.Make("Không có ảnh được cung cấp để cắt").Show();
                 await Shell.Current.GoToAsync("//Profile");
                 return;
             }
@@ -29,6 +30,13 @@ public partial class CropImagePage : ContentPage, IQueryAttributable
             PhotoSource = photoSource;
             imageEditor.Source = PhotoSource;
             imageEditor.ImageLoaded += ImageEditor_ImageLoaded;
+            Console.WriteLine($"[DEBUG] PhotoSource set to: {PhotoSource}");
+        }
+        else
+        {
+            Console.WriteLine("[ERROR] Invalid or missing PhotoSource in query");
+            await Toast.Make("Dữ liệu ảnh không hợp lệ").Show();
+            await Shell.Current.GoToAsync("//Profile");
         }
     }
 
@@ -36,22 +44,17 @@ public partial class CropImagePage : ContentPage, IQueryAttributable
     {
         try
         {
-            // Unsubscribe to prevent multiple calls
+            Console.WriteLine("[DEBUG] ImageEditor_ImageLoaded triggered");
             imageEditor.ImageLoaded -= ImageEditor_ImageLoaded;
 
-            // Wait a bit for the image to be fully rendered
             await Task.Delay(100);
-
-            // Apply circle crop
             imageEditor.Crop(ImageCropType.Circle);
-
-            // Don't call SaveEdits() immediately - let user see the crop preview
-            Console.WriteLine($"After Crop - HasUnsavedEdits: {imageEditor.HasUnsavedEdits}");
+            Console.WriteLine($"[DEBUG] After Crop - HasUnsavedEdits: {imageEditor.HasUnsavedEdits}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in ImageEditor_ImageLoaded: {ex.Message}");
-            await Shell.Current.DisplayAlert("Error", $"Failed to crop image: {ex.Message}", "OK");
+            Console.WriteLine($"[ERROR] ImageEditor_ImageLoaded failed: {ex.Message}");
+            await Shell.Current.DisplayAlert("Lỗi", $"Không thể cắt ảnh: {ex.Message}", "OK");
         }
     }
 
@@ -59,9 +62,10 @@ public partial class CropImagePage : ContentPage, IQueryAttributable
     {
         try
         {
+            Console.WriteLine("[DEBUG] Cancel_Click triggered");
             if (imageEditor.HasUnsavedEdits)
             {
-                if (await Shell.Current.DisplayAlert("Cancel Cropping?", "Do you really want to cancel this action?", "Yes", "No"))
+                if (await Shell.Current.DisplayAlert("Hủy cắt ảnh?", "Bạn có muốn hủy hành động này?", "Có", "Không"))
                 {
                     imageEditor.CancelEdits();
                     await Shell.Current.GoToAsync("//Profile");
@@ -69,7 +73,7 @@ public partial class CropImagePage : ContentPage, IQueryAttributable
             }
             else
             {
-                if (await Shell.Current.DisplayAlert("Cancel?", "Are you sure?", "Yes", "No"))
+                if (await Shell.Current.DisplayAlert("Hủy?", "Bạn có chắc chắn?", "Có", "Không"))
                 {
                     await Shell.Current.GoToAsync("//Profile");
                 }
@@ -77,7 +81,7 @@ public partial class CropImagePage : ContentPage, IQueryAttributable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in Cancel_Click: {ex.Message}");
+            Console.WriteLine($"[ERROR] Cancel_Click failed: {ex.Message}");
             await Shell.Current.GoToAsync("//Profile");
         }
     }
@@ -86,50 +90,50 @@ public partial class CropImagePage : ContentPage, IQueryAttributable
     {
         try
         {
+            Console.WriteLine("[DEBUG] AcceptChanges_Click triggered");
             if (!imageEditor.HasUnsavedEdits)
             {
-                Console.WriteLine($"HasUnsavedEdits: {imageEditor.HasUnsavedEdits}");
-                await Shell.Current.DisplayAlert("Alert", "There are no changes to save", "OK");
+                Console.WriteLine("[DEBUG] No unsaved edits");
+                await Shell.Current.DisplayAlert("Thông báo", "Không có thay đổi để lưu", "OK");
                 return;
             }
 
-            // Save the edits
             imageEditor.SaveEdits();
+            Console.WriteLine("[DEBUG] SaveEdits called");
 
-            // Get the edited image stream
             var newPhotoStream = await imageEditor.GetImageStream();
             if (newPhotoStream == null)
             {
-                await Shell.Current.DisplayAlert("Error", "Failed to get image stream.", "OK");
+                Console.WriteLine("[ERROR] GetImageStream returned null");
+                await Shell.Current.DisplayAlert("Lỗi", "Không thể lấy luồng ảnh.", "OK");
                 return;
             }
 
-            // Generate unique filename
             var extension = Path.GetExtension(PhotoSource) ?? ".jpg";
             var fileName = $"cropped_{Guid.NewGuid()}{extension}";
             var tempPath = Path.Combine(FileSystem.CacheDirectory, fileName);
 
-            // Save the cropped image
+            Console.WriteLine($"[DEBUG] Saving cropped image to: {tempPath}");
             using (var fileStream = File.Create(tempPath))
             {
                 await newPhotoStream.CopyToAsync(fileStream);
             }
 
-            // Dispose the stream
             newPhotoStream?.Dispose();
+            Console.WriteLine("[DEBUG] Image stream disposed");
 
-            // Navigate back with the new image path
             var encodedPath = Uri.EscapeDataString(tempPath);
-            await Shell.Current.GoToAsync($"//Profile?CroppedImage={encodedPath}");
+            // Sửa tham số truy vấn từ CroppedImage sang new-src
+            await Shell.Current.GoToAsync($"//Profile?new-src={encodedPath}");
+            Console.WriteLine($"[DEBUG] Navigating to Profile with new-src={encodedPath}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in AcceptChanges_Click: {ex.Message}");
-            await Shell.Current.DisplayAlert("Error", $"Failed to save cropped image: {ex.Message}", "OK");
+            Console.WriteLine($"[ERROR] AcceptChanges_Click failed: {ex.Message}");
+            await Shell.Current.DisplayAlert("Lỗi", $"Không thể lưu ảnh đã cắt: {ex.Message}", "OK");
         }
     }
 
-    // Clean up when page is disposed
     protected override void OnDisappearing()
     {
         if (imageEditor != null)
@@ -137,5 +141,6 @@ public partial class CropImagePage : ContentPage, IQueryAttributable
             imageEditor.ImageLoaded -= ImageEditor_ImageLoaded;
         }
         base.OnDisappearing();
+        Console.WriteLine("[DEBUG] CropImagePage OnDisappearing");
     }
 }
