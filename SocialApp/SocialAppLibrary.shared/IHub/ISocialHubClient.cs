@@ -19,6 +19,7 @@ namespace SocialAppLibrary.Shared.IHub
         Task PostCommentAdded(CommentDto commentDto);
         Task UserPhotoChange( UserPhotoChange userPhotoChange );
         Task NotificationGenerated(NotificationDto notificationDto);
+        Task FollowNotification(FollowNotificationDto notification);
     }
 
     public record struct UserPhotoChange(Guid UserId, string? UserPhotoUrl);

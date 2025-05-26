@@ -9,5 +9,5 @@
     {
         public static ApiResult<TData> Success(TData data) => new(true, data, null);
         public static ApiResult<TData> Fail(string errorMessage) => new(false, default!, errorMessage);
-    }   
+    }
 }
