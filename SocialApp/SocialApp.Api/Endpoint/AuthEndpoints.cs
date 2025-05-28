@@ -36,6 +36,32 @@ namespace SocialApp.Api.Endpoint
                     .DisableAntiforgery()
                     .Produces<ApiResult<string>>()
                     .WithName("User-UploadPhoto");
+            // Xác thực người dùng
+            authGroup.MapPost("/authenticate", async (LoginDto dto, AuthService authService) =>
+            {
+                var result = await authService.AuthenticateAsync(dto.Email, dto.Password);
+                return result.IsSuccess ? Results.Ok(result) : Results.Unauthorized();
+            })
+            .Produces<ApiResult<UserDto>>()
+            .WithName("Auth-Authenticate")
+            .AllowAnonymous();
+            /* Tạo endpoint POST /api/auth/authenticate để xác thực người dùng.
+             * Nhận LoginDto từ body, gọi IAuthService.AuthenticateAsync,
+             * trả về UserDto trong ApiResult<UserDto> nếu thành công, hoặc lỗi (401) nếu thất bại.
+             * Cho phép truy cập ẩn danh. */
+            // Lấy thông tin người dùng theo ID
+            authGroup.MapGet("/{userId:guid}", async (Guid userId, AuthService authService) =>
+            {
+                var result = await authService.GetUserByIdAsync(userId);
+                return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
+            })
+            .Produces<ApiResult<UserDto>>()
+            .WithName("Auth-GetUserById")
+            .RequireAuthorization();
+            /* Tạo endpoint GET /api/auth/{userId} để lấy thông tin người dùng.
+             * Nhận userId từ URL, gọi IAuthService.GetUserByIdAsync,
+             * trả về UserDto trong ApiResult<UserDto> nếu thành công, hoặc lỗi (400) nếu thất bại.
+             * Yêu cầu xác thực. */
 
             return app;
         }

@@ -17,8 +17,10 @@ namespace SocialApp.Api.Data.Entities
 
         public string? PhotoPath { get; set; } // so that we may move or delete 
         public string? PhotoUrl { get; set; } // so that it can be consumed by other apps 
-
-
+        public bool IsOnline { get; set; }
+        public bool IsAway { get; set; }
+        public string? AwayDuration { get; set; }
+        public DateTime? LastLogonTime { get; set; }
 
     }
 }

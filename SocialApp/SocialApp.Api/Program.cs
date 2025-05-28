@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SocialApp.Api.Data;
 using SocialApp.Api.Data.Entities;
-using SocialApp.Api.Services;
-
-using Microsoft.OpenApi.Models;
 using SocialApp.Api.Endpoint;
+using SocialApp.Api.Endpoints;
+using SocialApp.Api.ServiceInterface;
+using SocialApp.Api.ServiceInterface.ChatService;
+using SocialApp.Api.Services;
 using SocialAppLibrary.Shared;
 
 
@@ -39,6 +41,12 @@ builder.Services.AddTransient<FollowService>();
 builder.Services.AddTransient<PhotoUploadService>();
 builder.Services.AddScoped<IFollowService, FollowService>();
 builder.Services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
+
+
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IUserFriendService, UserFriendService>();
+
 
 //#23 Thêm dịch vụ Authentication (Xác thực) vào DI container
 builder.Services.AddAuthentication(options =>
@@ -133,6 +141,13 @@ app.MapAuthEndpoints();
 app.MapPostsEndpoints();
 app.MapUserEndpoints();
 app.MapFollowEndpoints();
+
+app.MapChatEndpoints(); 
+app.MapMessageEndpoints();
+app.MapUserFriendEndpoints();
+
+
+
 
 app.UseStaticFiles();
 app.MapHub<SocialApp.Api.Hubs.SocialHubs>(AppConstants.HubPattern);

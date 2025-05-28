@@ -152,5 +152,91 @@ namespace SocialApp.Api.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+
+
+
+
+        public async Task<ApiResult<UserDto>> AuthenticateAsync(string email, string password)
+        {
+            try
+            {
+                var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user == null)
+                {
+                    await Task.Delay(Random.Shared.Next(500, 1500));
+                    return ApiResult<UserDto>.Fail("Invalid login attempt");
+                }
+
+                var passwordVerification = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
+                if (passwordVerification == PasswordVerificationResult.Failed)
+                {
+                    await Task.Delay(Random.Shared.Next(500, 1500));
+                    return ApiResult<UserDto>.Fail("Invalid login attempt");
+                }
+
+                var token = GenerateJwtToken(user);
+                var userDto = new UserDto
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    PhotoUrl = user.PhotoUrl,
+                    IsOnline = user.IsOnline,
+                    IsAway = !user.IsOnline && user.LastLogonTime.HasValue,
+                    AwayDuration = !user.IsOnline && user.LastLogonTime.HasValue ? Utilities.CalcAwayDuration(user.LastLogonTime.Value) : null,
+                    LastLogonTime = user.LastLogonTime,
+                    //Token = token // Add token for client use
+                };
+
+                return ApiResult<UserDto>.Success(userDto);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<UserDto>.Fail(ex.Message);
+            }
+        }
+
+        public async Task<ApiResult<UserDto>> GetUserByIdAsync(Guid id)
+        {
+            try
+            {
+                var user = await _dataContext.Users.FindAsync(id);
+                if (user == null)
+                    return ApiResult<UserDto>.Fail("User not found");
+
+                var userDto = new UserDto
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    PhotoUrl = user.PhotoUrl,
+                    IsOnline = user.IsOnline,
+                    IsAway = !user.IsOnline && user.LastLogonTime.HasValue,
+                    AwayDuration = !user.IsOnline && user.LastLogonTime.HasValue ? Utilities.CalcAwayDuration(user.LastLogonTime.Value) : null,
+                    LastLogonTime = user.LastLogonTime
+                };
+
+                return ApiResult<UserDto>.Success(userDto);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<UserDto>.Fail(ex.Message);
+            }
+        }
+
+        public static class Utilities
+        {
+            public static string CalcAwayDuration(DateTime? lastLogonTime)
+            {
+                if (!lastLogonTime.HasValue) return "";
+                var duration = DateTime.UtcNow - lastLogonTime.Value;
+                return duration.TotalMinutes < 60
+                    ? $"{(int)duration.TotalMinutes} minutes"
+                    : duration.TotalHours < 24
+                        ? $"{(int)duration.TotalHours} hours"
+                        : $"{(int)duration.TotalDays} days";
+            }
+        }
     }
 }

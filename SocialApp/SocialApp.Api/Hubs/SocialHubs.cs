@@ -6,6 +6,7 @@ namespace SocialApp.Api.Hubs
 {
     public class SocialHubs : Hub<ISocialHubClient>
     {
+        
         public override Task OnConnectedAsync()
         {
             // Handle when a client connects
@@ -16,11 +17,7 @@ namespace SocialApp.Api.Hubs
             // Handle when a client disconnects
             return base.OnDisconnectedAsync(exception);
         }
-        public async Task SendMessage(string message)
-        {
-            // Handle when a client sends a message
-           
-        }
+        
         public async Task FollowNotification(FollowNotificationDto notification)
         {
             await Clients.User(notification.FollowerId.ToString()).FollowNotification(notification);
