@@ -2,6 +2,6 @@
 {
     public interface IListChatService
     {
-        Task<ListChatInitializeResponseDto> InitializeAsync(int userId);
+        Task<ListChatInitializeResponseDto> InitializeAsync(Guid userId);
     }
 }

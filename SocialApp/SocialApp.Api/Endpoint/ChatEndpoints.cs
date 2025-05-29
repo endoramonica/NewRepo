@@ -1,61 +1,61 @@
-﻿using SocialApp.Api.ServiceInterface;
+﻿using Microsoft.AspNetCore.SignalR;
 using SocialApp.Api.Services;
 using SocialAppLibrary.Shared.Dtos;
-using System.Security.Claims;
+using SocialApp.Api.ServiceInterface.ChatService;
 
-namespace SocialApp.Api.Endpoints
+namespace SocialApp.Api.Endpoint
 {
     public static class ChatEndpoints
     {
         public static IEndpointRouteBuilder MapChatEndpoints(this IEndpointRouteBuilder app)
         {
             var chatGroup = app.MapGroup("/api/chat")
-                               .WithTags("Chat");
+                               .WithTags("Chat")
+                               .RequireAuthorization();
 
-            // Khởi tạo dữ liệu chat
-            chatGroup.MapPost("/initialize", async (HttpContext context, AuthService authService, IUserFriendService userFriendService, IMessageService messageService) =>
+            // Gửi tin nhắn đến một người dùng
+            chatGroup.MapPost("/send", async (
+                SendMessageDto request,
+                IChatService chatService) =>
             {
-                try
-                {
-                    // Lấy userId từ JWT token
-                    var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                    if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-                        return Results.Unauthorized();
-
-                    var userResult = await authService.GetUserByIdAsync(userId);
-                    if (!userResult.IsSuccess || userResult.Data == null)
-                        return Results.BadRequest(userResult.Error);
-
-                    var friendsResult = await userFriendService.GetUserFriendsAsync(userId);
-                    if (!friendsResult.IsSuccess || friendsResult.Data == null)
-                        return Results.BadRequest(friendsResult.Error);
-
-                    var messagesResult = await messageService.GetLastestMessageAsync(userId);
-                    if (!messagesResult.IsSuccess || messagesResult.Data == null)
-                        return Results.BadRequest(messagesResult.Error);
-
-                    var response = new ListChatInitializeResponseDto
-                    {
-                        User = userResult.Data,
-                        UserFriends = friendsResult.Data,
-                        LastestMessages = messagesResult.Data
-                    };
-
-                    return Results.Ok(ApiResult<ListChatInitializeResponseDto>.Success(response));
-                }
-                catch (Exception ex)
-                {
-                    return Results.BadRequest(ApiResult<ListChatInitializeResponseDto>.Fail(ex.Message));
-                }
+                var result = await chatService.SendMessageToUserAsync(request.FromUserId, request.ToUserId, request.Content);
+                return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
             })
-            .Produces<ApiResult<ListChatInitializeResponseDto>>()
-            .WithName("Chat-Initialize")
-            .RequireAuthorization();
-            /* Tạo endpoint POST /api/chat/initialize để khởi tạo dữ liệu chat.
-             * Lấy userId từ JWT token, gọi IAuthService.GetUserByIdAsync, IUserFriendService.GetUserFriendsAsync,
-             * và IMessageService.GetLastestMessageAsync, trả về ChatInitializeResponseDto chứa thông tin người dùng,
-             * danh sách bạn bè, và tin nhắn mới nhất trong ApiResult<ChatInitializeResponseDto> nếu thành công,
-             * hoặc lỗi (400) nếu thất bại. Yêu cầu xác thực. */
+            .Produces<ApiResult<bool>>()
+            .WithName("Chat-SendToUser");
+
+            // Gửi tin nhắn đến tất cả người dùng
+            chatGroup.MapPost("/broadcast", async (
+                BroadcastMessageRequest request,
+                IChatService chatService) =>
+            {
+                var result = await chatService.SendMessageToAllAsync(request.Content);
+                return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
+            })
+            .Produces<ApiResult<bool>>()
+            .WithName("Chat-Broadcast");
+
+            // Thêm kết nối
+            chatGroup.MapPost("/connect", async (
+                ConnectionRequest request,
+                IChatService chatService) =>
+            {
+                await chatService.AddConnectionAsync(request.UserId, request.ConnectionId);
+                return Results.Ok(ApiResult<bool>.Success(true));
+            })
+            .Produces<ApiResult<bool>>()
+            .WithName("Chat-AddConnection");
+
+            // Xóa kết nối
+            chatGroup.MapPost("/disconnect", async (
+                DisconnectionRequest request,
+                IChatService chatService) =>
+            {
+                await chatService.RemoveConnectionAsync(request.UserId);
+                return Results.Ok(ApiResult<bool>.Success(true));
+            })
+            .Produces<ApiResult<bool>>()
+            .WithName("Chat-RemoveConnection");
 
             return app;
         }

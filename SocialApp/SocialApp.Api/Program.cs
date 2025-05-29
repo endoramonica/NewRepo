@@ -45,6 +45,8 @@ builder.Services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
 
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IChatService, ChatService>();
+
+builder.Services.AddScoped<IListChatService, ListChatService>();
 builder.Services.AddScoped<IUserFriendService, UserFriendService>();
 
 

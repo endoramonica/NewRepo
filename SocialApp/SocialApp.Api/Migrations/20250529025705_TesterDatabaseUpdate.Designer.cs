@@ -12,8 +12,8 @@ using SocialApp.Api.Data;
 namespace SocialApp.Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250326065955_RenamePasswordColumn")]
-    partial class RenamePasswordColumn
+    [Migration("20250529025705_TesterDatabaseUpdate")]
+    partial class TesterDatabaseUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,6 +68,34 @@ namespace SocialApp.Api.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("SocialApp.Api.Data.Entities.Follow", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("FollowedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("FollowerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FollowingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FollowingId");
+
+                    b.HasIndex("FollowerId", "FollowingId")
+                        .IsUnique();
+
+                    b.ToTable("Follows");
+                });
+
             modelBuilder.Entity("SocialApp.Api.Data.Entities.Likes", b =>
                 {
                     b.Property<Guid>("PostId")
@@ -81,6 +109,39 @@ namespace SocialApp.Api.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Likes");
+                });
+
+            modelBuilder.Entity("SocialApp.Api.Data.Entities.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FromUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("SendDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ToUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromUserId");
+
+                    b.HasIndex("ToUserId");
+
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("SocialApp.Api.Data.Entities.Notification", b =>
@@ -156,17 +217,29 @@ namespace SocialApp.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AwayDuration")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsAway")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastLogonTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("PasswordHarsh")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
@@ -181,6 +254,24 @@ namespace SocialApp.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("SocialApp.Api.Data.Entities.UserFriend", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FriendId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "FriendId");
+
+                    b.HasIndex("FriendId");
+
+                    b.HasIndex("UserId", "FriendId")
+                        .IsUnique();
+
+                    b.ToTable("UserFriends");
                 });
 
             modelBuilder.Entity("SocialAppLibrary.Shared.Dtos.PostDto", b =>
@@ -256,6 +347,25 @@ namespace SocialApp.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SocialApp.Api.Data.Entities.Follow", b =>
+                {
+                    b.HasOne("SocialApp.Api.Data.Entities.User", "Follower")
+                        .WithMany()
+                        .HasForeignKey("FollowerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SocialApp.Api.Data.Entities.User", "Following")
+                        .WithMany()
+                        .HasForeignKey("FollowingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Follower");
+
+                    b.Navigation("Following");
+                });
+
             modelBuilder.Entity("SocialApp.Api.Data.Entities.Likes", b =>
                 {
                     b.HasOne("SocialApp.Api.Data.Entities.Post", "Post")
@@ -275,6 +385,25 @@ namespace SocialApp.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SocialApp.Api.Data.Entities.Message", b =>
+                {
+                    b.HasOne("SocialApp.Api.Data.Entities.User", "FromUser")
+                        .WithMany()
+                        .HasForeignKey("FromUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SocialApp.Api.Data.Entities.User", "ToUser")
+                        .WithMany()
+                        .HasForeignKey("ToUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FromUser");
+
+                    b.Navigation("ToUser");
+                });
+
             modelBuilder.Entity("SocialApp.Api.Data.Entities.Notification", b =>
                 {
                     b.HasOne("SocialApp.Api.Data.Entities.User", "User")
@@ -285,7 +414,8 @@ namespace SocialApp.Api.Migrations
 
                     b.HasOne("SocialApp.Api.Data.Entities.Post", "Post")
                         .WithMany()
-                        .HasForeignKey("PostId");
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Post");
 
@@ -299,6 +429,25 @@ namespace SocialApp.Api.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SocialApp.Api.Data.Entities.UserFriend", b =>
+                {
+                    b.HasOne("SocialApp.Api.Data.Entities.User", "Friend")
+                        .WithMany()
+                        .HasForeignKey("FriendId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SocialApp.Api.Data.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Friend");
 
                     b.Navigation("User");
                 });
