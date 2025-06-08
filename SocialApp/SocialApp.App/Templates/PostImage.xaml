@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:controls="clr-namespace:SocialApp.App.Controls"
-             x:DataType="models:PostModel"
-             xmlns:vm ="clr-namespace:SocialApp.App.ViewModels"
-             xmlns:models="clr-namespace:SocialApp.App.Models"
-             x:Class="SocialApp.App.Templates.PostImage">
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"  
+             xmlns:controls="clr-namespace:SocialApp.App.Controls"  
+             xmlns:vm="clr-namespace:SocialApp.App.ViewModels"  
+             xmlns:models="clr-namespace:SocialApp.App.Models"  
+             x:Class="SocialApp.App.Templates.PostImage"  
+             x:DataType="models:PostModel">
 
-    <!-- Khung chứa bài viết 2 -->
+    <!-- Khung chứa bài viết -->
     <Border Padding="8"
             StrokeThickness="0"
             BackgroundColor="White">
-        <Grid RowDefinitions="Auto, Auto, Auto, Auto,Auto"
+        <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto"
               RowSpacing="8">
 
             <!-- Phần thông tin người đăng -->
@@ -30,41 +30,46 @@
                            HeightRequest="30"
                            VerticalOptions="Center"
                            HorizontalOptions="Center"
-                           Aspect="AspectFit" >
+                           Aspect="AspectFit">
                         <Image.Clip>
                             <EllipseGeometry Center="15,15" RadiusX="15" RadiusY="15"/>
                         </Image.Clip>
                     </Image>
-                    
                 </Border>
 
                 <!-- Thông tin người dùng -->
                 <VerticalStackLayout Grid.Column="1"
-                                     Spacing="2">
+                                     Spacing="2"
+                                     VerticalOptions="Center">
                     <Label FontAttributes="Bold"
                            Text="{Binding UserName}"
                            VerticalOptions="Center" />
 
                     <Label FontSize="12"
-                    Text="{Binding PostedOnDisplay }"
-                    VerticalOptions="Center"
-                    TextColor="Gray" />
+                           Text="{Binding PostedOnDisplay}"
+                           VerticalOptions="Center"
+                           TextColor="Gray" />
                 </VerticalStackLayout>
+
+                <!-- Nút Follow -->
+                
+
             </Grid>
 
             <!-- Hình ảnh bài viết -->
             <Border Grid.Row="1"
                     BackgroundColor="LightSalmon"
-                    StrokeThickness="0">
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 25">
                 <Image Aspect="AspectFill"
                        HeightRequest="250"
                        Source="{Binding PhotoUrl}"
                        HorizontalOptions="Fill"
                        VerticalOptions="Fill" />
                 <Border.GestureRecognizers>
-                    <TapGestureRecognizer 
-                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}},
-                        Path=GoToPostDetailsPageCommand}" CommandParameter="{Binding .}" />
+                    <TapGestureRecognizer  
+                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}}, Path=GoToPostDetailsPageCommand}"
+                        CommandParameter="{Binding .}" />
                 </Border.GestureRecognizers>
             </Border>
 
@@ -73,25 +78,23 @@
                    Text="{Binding Content}"
                    Padding="10,5"
                    FontSize="14"
-                   TextColor="Black" >
+                   TextColor="Black">
                 <Label.GestureRecognizers>
-                    <TapGestureRecognizer 
-                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}},
-                        Path=GoToPostDetailsPageCommand}" CommandParameter="{Binding .}" >
-                    </TapGestureRecognizer>
+                    <TapGestureRecognizer  
+                        Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}}, Path=GoToPostDetailsPageCommand}"
+                        CommandParameter="{Binding .}" />
                 </Label.GestureRecognizers>
             </Label>
 
             <!-- Đường kẻ mờ -->
             <BoxView Grid.Row="3"
                      Style="{StaticResource FadedLineStyle}" />
+
             <!-- Gọi lại PostActionButtons -->
             <controls:PostActionButtons Grid.Row="4"
 Post="{Binding .}"
 ViewModel="{Binding Source={x:RelativeSource AncestorType={x:Type vm:PostBaseViewModel}}}"
 Padding="5" />
-
         </Grid>
-
     </Border>
 </ContentView>

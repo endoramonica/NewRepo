@@ -85,10 +85,14 @@ namespace SocialApp.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FollowingId");
-
                     b.HasIndex("FollowerId", "FollowingId")
                         .IsUnique();
+
+                    b.HasIndex("FollowerId", "IsActive")
+                        .HasDatabaseName("IX_Follows_FollowerId_IsActive");
+
+                    b.HasIndex("FollowingId", "IsActive")
+                        .HasDatabaseName("IX_Follows_FollowingId_IsActive");
 
                     b.ToTable("Follows");
                 });
@@ -260,6 +264,12 @@ namespace SocialApp.Api.Migrations
 
                     b.Property<Guid>("FriendId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("UserId", "FriendId");
 

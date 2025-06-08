@@ -73,7 +73,7 @@ public partial class RegisterViewModel : BaseViewModel
 
 
     [ObservableProperty]
-    private string _photoImageSource;
+    private string _photoImageSource = "add_a_photo.png";
     [ObservableProperty]
     private string? _cropPhotoSource = "account_circle.png";
 
@@ -99,5 +99,10 @@ public partial class RegisterViewModel : BaseViewModel
             };
             await Shell.Current.GoToAsync("//CropImagePage", param);
         }
+    }
+    [RelayCommand]
+    private async Task AcessLogin()
+    {
+        await Shell.Current.GoToAsync("///LoginPage");
     }
 }

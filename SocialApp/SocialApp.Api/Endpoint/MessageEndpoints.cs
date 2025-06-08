@@ -1,6 +1,7 @@
 ﻿using SocialApp.Api.Services;
 using SocialApp.Api.ServiceInterface;
 using SocialAppLibrary.Shared.Dtos;
+using SocialAppLibrary.Shared.Dtos.ChatDto;
 
 namespace SocialApp.Api.Endpoints
 {

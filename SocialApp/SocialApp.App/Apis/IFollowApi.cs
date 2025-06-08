@@ -18,4 +18,13 @@ public interface IFollowApi
 
     [Get("/api/follow/followers/search")]
     Task<ApiResult<LoggedInUser[]>> SearchFollowersAsync([Query] string q, int startIndex, int pageSize);
+    
+    [Get("/api/follow/followers/is-following")]
+    Task<ApiResult<bool>> IsFollowingAsync([Query] Guid followingId);
+    // Thêm mới
+    [Get("/api/follow/follower-count")]
+    Task<ApiResult<int>> GetFollowerCountAsync();
+
+    [Get("/api/follow/following-count")]
+    Task<ApiResult<int>> GetFollowingCountAsync();
 }

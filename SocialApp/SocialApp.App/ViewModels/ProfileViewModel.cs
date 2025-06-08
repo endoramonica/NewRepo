@@ -6,6 +6,7 @@ using SocialApp.App.Models;
 using SocialApp.App.Pages;
 using SocialApp.App.Services;
 using SocialAppLibrary.Shared.Dtos;
+using SocialAppLibrary.Shared.Dtos.ChatDto;
 using SocialAppLibrary.Shared.IHub;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -20,7 +21,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
     private readonly IUserApi _userApi;
     private readonly RealTimeUpdatesService _realTimeUpdatesService;
 
-    public FollowViewModel FollowViewModel { get; }
+    
 
     public ProfileViewModel(IPostApi postApi, IFollowApi followApi, AuthService authService, IUserApi userApi, RealTimeUpdatesService realTimeUpdatesService)
         : base(postApi)
@@ -30,7 +31,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
         _userApi = userApi;
         _realTimeUpdatesService = realTimeUpdatesService;
         User = _authService.User ?? throw new InvalidOperationException("User must not be null.");
-        FollowViewModel = new FollowViewModel(postApi, followApi, userApi, authService, realTimeUpdatesService);
+        
         Console.WriteLine($"[DEBUG] ProfileViewModel initialized. CropPhotoSource: {CropPhotoSource}");
     }
 
@@ -288,7 +289,14 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
             }
         });
     }
-
+    [RelayCommand]
+    private async Task SendFriendRequestFromProfileAsync()
+    {
+        var dto = new FriendRequestDto(_authService.User.ID, TargetUser.ID);
+        var result = await _userApi.SendFriendRequestAsync(dto);
+        await App.Current.MainPage.DisplayAlert(result.IsSuccess ? "Thành công" : "Lỗi",
+            result.IsSuccess ? "Đã gửi lời mời kết bạn!" : result.Error, "OK");
+    }
     private void UpdateUserPhotoInPosts(string newPhotoUrl)
     {
         var currentUserId = User.ID;
@@ -393,10 +401,7 @@ public partial class ProfileViewModel : PostBaseViewModel, IDisposable
     public void Dispose()
     {
         _realTimeUpdatesService?.RemoveHandler(nameof(ProfileViewModel));
-        if (FollowViewModel is IDisposable disposableFollowViewModel)
-        {
-            disposableFollowViewModel.Dispose();
-        }
+        
         Console.WriteLine("[DEBUG] ProfileViewModel disposed");
     }
 

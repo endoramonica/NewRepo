@@ -16,6 +16,8 @@ namespace SocialApp.Api.Services
         Task<ApiResult<LoggedInUser[]>> GetFollowingAsync(Guid userId, int startIndex, int pageSize);
         Task<ApiResult<LoggedInUser[]>> SearchFollowersAsync(Guid userId, string query, int startIndex, int pageSize);
         Task<ApiResult<bool>> IsFollowingAsync(Guid followerId, Guid followingId);
+        Task<ApiResult<int>> GetFollowerCountAsync(Guid userId);
+        Task<ApiResult<int>> GetFollowingCountAsync(Guid userId);
     }
 
     public class FollowService : IFollowService
@@ -28,7 +30,19 @@ namespace SocialApp.Api.Services
             _context = context;
             _hubContext = hubContext;
         }
-
+        public async Task<ApiResult<bool>> IsFollowingAsync(Guid followerId, Guid followingId)
+        {
+            try
+            {
+                var isFollowing = await _context.Follows
+                    .AnyAsync(f => f.FollowerId == followerId && f.FollowingId == followingId && f.IsActive);
+                return ApiResult<bool>.Success(isFollowing);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<bool>.Fail(ex.Message);
+            }
+        }
         public async Task<ApiResult<string>> FollowAsync(Guid followerId, Guid followingId)
         {
             if (followerId == followingId)
@@ -163,19 +177,35 @@ namespace SocialApp.Api.Services
                 return ApiResult<LoggedInUser[]>.Fail(ex.Message);
             }
         }
-
-        public async Task<ApiResult<bool>> IsFollowingAsync(Guid followerId, Guid followingId)
+        public async Task<ApiResult<int>> GetFollowerCountAsync(Guid userId)
         {
             try
             {
-                var isFollowing = await _context.Follows
-                    .AnyAsync(f => f.FollowerId == followerId && f.FollowingId == followingId && f.IsActive);
-                return ApiResult<bool>.Success(isFollowing);
+                var count = await _context.Follows
+                    .Where(f => f.FollowingId == userId && f.IsActive)
+                    .CountAsync();
+                return ApiResult<int>.Success(count);
             }
             catch (Exception ex)
             {
-                return ApiResult<bool>.Fail(ex.Message);
+                return ApiResult<int>.Fail(ex.Message);
             }
         }
+
+        public async Task<ApiResult<int>> GetFollowingCountAsync(Guid userId)
+        {
+            try
+            {
+                var count = await _context.Follows
+                    .Where(f => f.FollowerId == userId && f.IsActive)
+                    .CountAsync();
+                return ApiResult<int>.Success(count);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<int>.Fail(ex.Message);
+            }
+        }
+
     }
 }

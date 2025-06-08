@@ -73,7 +73,7 @@ public partial class DetailsViewModel : PostBaseViewModel
     [ObservableProperty]
     private string? _commentContent;
 
-    
+
 
 
 
@@ -87,25 +87,26 @@ public partial class DetailsViewModel : PostBaseViewModel
         }
         await MakeApiCall(async () =>
         {
-            if (Post.PostId != Guid.Empty) // Ensure PostId is not an empty Guid
+            if (Post.PostId != Guid.Empty)
             {
                 var newCommentDto = new SaveCommentDto
                 {
-                    PostId = Post.PostId, // Explicitly cast nullable Guid to Guid
+                    PostId = Post.PostId,
                     Content = CommentContent,
                 };
 
-                var result = await PostApi.SaveCommentAsync(Post.PostId, newCommentDto); // Explicitly cast nullable Guid to Guid
+                var result = await PostApi.SaveCommentAsync(Post.PostId, newCommentDto);
                 if (!result.IsSuccess)
                 {
                     await ShowErrorAlertAsync(result.Error);
                     return;
                 }
-                //var addedComment = result.Data;
-                //Comments = [addedComment, .. Comments]; // Add the new comment to the collection
-                //23/5 no need here cause a signal ill be sent instead of                                         // Clear the comment entry field
-                CommentContent = string.Empty; // Clear the input field
-                OnPropertyChanged(nameof(Comments)); // Notify the UI about the change
+
+                // Thêm bình luận mới vào danh sách ngay sau khi API thành công
+                var addedComment = result.Data; // Giả định API trả về CommentDto
+                Comments = [addedComment, .. Comments]; // Thêm bình luận vào đầu danh sách
+                CommentContent = string.Empty; // Xóa trường nhập
+                OnPropertyChanged(nameof(Comments)); // Cập nhật giao diện
                 await ToastAsync("Comment added successfully.");
             }
             else

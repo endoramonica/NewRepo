@@ -10,10 +10,14 @@ public partial class PostBaseViewModel:BaseViewModel
 {
     public  IPostApi PostApi { get;  }
 
-    public PostBaseViewModel( IPostApi postApi)
+   
+
+    public PostBaseViewModel(IPostApi postApi) // inject thêm
     {
         PostApi = postApi;
+        
     }
+
     protected bool SkipGoToDetailsPage { get; set; }
     protected virtual void OnToggleBookmarkedAsync(PostModel postModel)
     {
@@ -39,6 +43,11 @@ public partial class PostBaseViewModel:BaseViewModel
             [nameof(DetailsViewModel.Post)] = post
         };
         await NavigationAsync("///PostDetailsPage", param);
+    }
+    [RelayCommand]
+    private async Task GoToHomePageAsync()
+    {
+        await NavigationAsync("///HomePage");
     }
 
     [RelayCommand]
@@ -80,12 +89,10 @@ public partial class PostBaseViewModel:BaseViewModel
     [RelayCommand]
     private async Task SharePostAsync(PostModel post)
     {
-
         string? tempPhotoPath = null;
 
         if (!string.IsNullOrWhiteSpace(post.PhotoUrl))
         {
-           
             tempPhotoPath = await DownloadPhotosAsync(post.PhotoUrl);
             if (string.IsNullOrWhiteSpace(tempPhotoPath))
             {
@@ -94,19 +101,25 @@ public partial class PostBaseViewModel:BaseViewModel
             }
         }
 
-        var shareText = $"Check out this post by {post.UserName ?? "someone"}!";
-        var shareFile = new ShareFile(tempPhotoPath);
-        var request = string.IsNullOrWhiteSpace(tempPhotoPath)
-            ? new ShareFileRequest
-            (
-                "Maui Social",
-                 shareFile
-            )
-            : new ShareFileRequest("Maui Social", new ShareFile(tempPhotoPath));
-
         try
         {
-            await Share.Default.RequestAsync(request);
+            if (!string.IsNullOrWhiteSpace(tempPhotoPath))
+            {
+                await Share.Default.RequestAsync(new ShareFileRequest
+                {
+                    Title = $"Bài viết từ {post.UserName ?? "ai đó"}",
+                    File = new ShareFile(tempPhotoPath)
+                });
+            }
+            else
+            {
+                // Không có ảnh, chia sẻ văn bản
+                await Share.Default.RequestAsync(new ShareTextRequest
+                {
+                    Title = "Maui Social",
+                    Text = $"Check out this post by {post.UserName ?? "someone"}!"
+                });
+            }
         }
         catch (Exception)
         {

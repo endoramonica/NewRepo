@@ -8,39 +8,54 @@
     x:Name="this"
     x:DataType="models:PostModel">
 
-    <HorizontalStackLayout Spacing="15" Padding="10">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <Style x:Key="ActionButtonStyle" TargetType="ImageButton">
+                <Setter Property="WidthRequest" Value="32" />
+                <Setter Property="HeightRequest" Value="32" />
+                <Setter Property="CornerRadius" Value="16" />
+                <Setter Property="Padding" Value="6" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="HorizontalOptions" Value="Center" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <Grid Padding="12,8" ColumnSpacing="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
         <!-- Like Button -->
-        <ImageButton 
+        <ImageButton Grid.Column="0"
             Source="{Binding IsLikedIcon}"  
-            BackgroundColor="Pink"
-            WidthRequest="30"  
-            HeightRequest="30"  
+            Style="{StaticResource ActionButtonStyle}"
             Command="{Binding Source={x:Reference this}, Path=ViewModel.ToggleLikeCommand}"  
             CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />
 
         <!-- Bookmark Button -->
-        <ImageButton 
+        <ImageButton Grid.Column="1"
             Source="{Binding IsBookmarkedIcon}" 
-            BackgroundColor="SandyBrown"
-            WidthRequest="30"  
-            HeightRequest="30"  
+            Style="{StaticResource ActionButtonStyle}"
             Command="{Binding Source={x:Reference this}, Path=ViewModel.ToggleBookMarkCommand}"  
             CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />
 
         <!-- Comment Button -->
-        <ImageButton 
+        <ImageButton Grid.Column="2"
             Source="message_circle_heart.png"  
-            WidthRequest="30"  
-            HeightRequest="30"  
+            Style="{StaticResource ActionButtonStyle}"
             Command="{Binding Source={x:Reference this}, Path=ViewModel.GoToPostDetailsPageCommand}"  
             CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />
+
         <!-- Share Button -->
-        <ImageButton 
+        <ImageButton Grid.Column="3"
             Source="share.png"  
-            WidthRequest="30"  
-            HeightRequest="30"  
+            Style="{StaticResource ActionButtonStyle}"
             Command="{Binding Source={x:Reference this}, Path=ViewModel.SharePostCommand}"  
             CommandParameter="{Binding Source={x:Reference this}, Path=Post}" />
-    </HorizontalStackLayout>
+    </Grid>
 </ContentView>

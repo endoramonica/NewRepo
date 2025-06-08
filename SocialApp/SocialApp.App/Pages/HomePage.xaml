@@ -42,13 +42,14 @@
                         <TapGestureRecognizer Command="{Binding NavigateToProfileCommand}" />
                     </Image.GestureRecognizers>
                 </Image>
-
-                <!-- Icon ngôi sao -->
-                <Image Grid.Column="3" Source="ngoisao.png" HeightRequest="30" WidthRequest="30" VerticalOptions="Center">
+                <!-- Icon Friend + Group -->
+                <Image Grid.Column="3" Source="group.png" HeightRequest="30" WidthRequest="30" VerticalOptions="Center">
                     <Image.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding NavigateToFollowCommand}" />
+                        <TapGestureRecognizer Command="{Binding NavigateToFriendCommand}" />
                     </Image.GestureRecognizers>
                 </Image>
+                <!-- Icon ngôi sao -->
+                
             </Grid>
         </Grid>
     </Shell.TitleView>

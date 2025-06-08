@@ -1,6 +1,7 @@
 ﻿using SocialApp.Api.ServiceInterface;
 using SocialApp.Api.Services;
 using SocialAppLibrary.Shared.Dtos;
+using SocialAppLibrary.Shared.Dtos.ChatDto;
 using System.Security.Claims;
 
 namespace SocialApp.Api.Endpoints

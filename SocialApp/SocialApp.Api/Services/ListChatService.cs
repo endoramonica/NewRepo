@@ -1,4 +1,5 @@
 ﻿using SocialApp.Api.ServiceInterface;
+using SocialAppLibrary.Shared.Dtos.ChatDto;
 
 namespace SocialApp.Api.Services
 {

@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:y="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:controls="clr-namespace:SocialApp.App.Controls"
+    xmlns:vm="clr-namespace:SocialApp.App.ViewModels"
+    x:Class="SocialApp.App.Pages.FriendsPage"
+    x:DataType="vm:FriendViewModel"
+    xmlns:converters="clr-namespace:SocialApp.App.Converters"
+    xmlns:dtos="clr-namespace:SocialAppLibrary.Shared.Dtos.ChatDto;assembly=SocialAppLibrary.Shared"
+    Title="Danh sách bạn bè">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="home.png" Command="{Binding GoToHomePageCommand}" Priority="0" Order="Primary"/>
+        <ToolbarItem IconImageSource="search.png" Command="{Binding SearchFriendsCommand}" Priority="1" Order="Primary"/>
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:IntToBoolConverter x:Key="IntToBoolConverter" />
+            <converters:InitialLetterConverter x:Key="InitialLetterConverter" />
+
+            <!-- Card Styles -->
+            <Style x:Key="FriendCardStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="Padding" Value="16" />
+                <Setter Property="Margin" Value="12,6" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                <Setter Property="Shadow">
+                    <Shadow Brush="#E0E0E0" Opacity="0.3" Radius="4" Offset="0,2" />
+                </Setter>
+            </Style>
+
+            <Style x:Key="PendingRequestCardStyle" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="#FFF8E1" />
+                <Setter Property="Padding" Value="16" />
+                <Setter Property="Margin" Value="12,6" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                <Setter Property="Stroke" Value="#FFB74D" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="Shadow">
+                    <Shadow Brush="#FFB74D" Opacity="0.2" Radius="4" Offset="0,2" />
+                </Setter>
+            </Style>
+
+            <!-- Typography Styles -->
+            <Style x:Key="NameLabelStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="17" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="#1A1A1A" />
+            </Style>
+
+            <Style x:Key="EmailLabelStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="TextColor" Value="#666666" />
+                <Setter Property="Margin" Value="0,2,0,0" />
+            </Style>
+
+            <Style x:Key="SectionHeaderStyle" TargetType="Label">
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="#2C3E50" />
+                <Setter Property="Margin" Value="12,24,12,12" />
+            </Style>
+
+            <!-- Button Styles -->
+            <Style x:Key="PrimaryActionButtonStyle" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#27AE60" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="CornerRadius" Value="22" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="Padding" Value="16,8" />
+                <Setter Property="Margin" Value="4,0" />
+            </Style>
+
+            <Style x:Key="IconButtonStyle" TargetType="Button">
+                <Setter Property="CornerRadius" Value="22" />
+                <Setter Property="WidthRequest" Value="44" />
+                <Setter Property="HeightRequest" Value="44" />
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="Margin" Value="4,0" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+
+            <Style x:Key="MessageButtonStyle" TargetType="Button" BasedOn="{StaticResource IconButtonStyle}">
+                <Setter Property="BackgroundColor" Value="#3498DB" />
+                <Setter Property="TextColor" Value="White" />
+            </Style>
+
+            <Style x:Key="DeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource IconButtonStyle}">
+                <Setter Property="BackgroundColor" Value="#E74C3C" />
+                <Setter Property="TextColor" Value="White" />
+            </Style>
+
+            <!-- Search Entry Style -->
+            <Style x:Key="SearchEntryStyle" TargetType="Entry">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="TextColor" Value="#2C3E50" />
+                <Setter Property="PlaceholderColor" Value="#95A5A6" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="Margin" Value="12,16,12,8" />
+                <Setter Property="HeightRequest" Value="48" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid BackgroundColor="#F5F7FA">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Search Section -->
+        <Border Grid.Row="0" 
+                BackgroundColor="White" 
+                Padding="0,0,0,12"
+                StrokeShape="RoundRectangle 0,0,16,16">
+            <Border.Shadow>
+                <Shadow Brush="#E0E0E0" Opacity="0.2" Radius="4" Offset="0,2" />
+            </Border.Shadow>
+            <Entry Placeholder="🔍 Nhập ID hoặc tên người dùng để tìm kiếm"
+                   Text="{Binding ToUserIdInput, Mode=TwoWay}"
+                   Style="{StaticResource SearchEntryStyle}"
+                   ClearButtonVisibility="WhileEditing"
+                   ReturnCommand="{Binding SearchFriendsCommand}" />
+        </Border>
+
+        <RefreshView Grid.Row="1"
+                     Command="{Binding LoadFriendsCommand}"
+                     IsRefreshing="{Binding IsBusy}"
+                     RefreshColor="#3498DB">
+            <ScrollView>
+                <StackLayout Spacing="0" Padding="0,8,0,80">
+
+                    <!-- Empty State -->
+                    <StackLayout IsVisible="{Binding HasNoFriends}"
+                                 VerticalOptions="Center"
+                                 Margin="32,60">
+                        <Label Text="👥" FontSize="64" HorizontalOptions="Center" Opacity="0.7" />
+                        <Label Text="Chưa có bạn bè nào" 
+                               FontSize="20" 
+                               FontAttributes="Bold" 
+                               HorizontalOptions="Center" 
+                               TextColor="#34495E" 
+                               Margin="0,16,0,8" />
+                        <Label Text="Hãy kết nối với những người bạn mới!" 
+                               FontSize="15" 
+                               HorizontalOptions="Center" 
+                               TextColor="#7F8C8D" 
+                               Margin="0,0,0,24" />
+                        <Button Text="Thêm bạn bè" 
+                                Style="{StaticResource PrimaryActionButtonStyle}"
+                                Command="{Binding SendFriendRequestCommand}"
+                                HorizontalOptions="Center" />
+                    </StackLayout>
+
+                    <!-- Friends List -->
+                    <StackLayout IsVisible="{Binding Friends.Count, Converter={StaticResource IntToBoolConverter}}">
+                        <Label Text="Bạn bè của bạn" Style="{StaticResource SectionHeaderStyle}" />
+
+                        <CollectionView ItemsSource="{Binding Friends}"
+                                        BackgroundColor="Transparent"
+                                        SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="dtos:UserDto">
+                                    <Border Style="{StaticResource FriendCardStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Avatar -->
+                                            <Border Grid.Column="0"
+                                                    WidthRequest="48"
+                                                    HeightRequest="48"
+                                                    BackgroundColor="#3498DB"
+                                                    StrokeShape="RoundRectangle 24">
+                                                <Border.Shadow>
+                                                    <Shadow Brush="#3498DB" Opacity="0.3" Radius="4" Offset="0,2" />
+                                                </Border.Shadow>
+                                                <Label Text="{Binding Name, Converter={StaticResource InitialLetterConverter}}"
+                                                       FontSize="18"
+                                                       FontAttributes="Bold"
+                                                       TextColor="White"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+
+                                            <!-- User Info -->
+                                            <StackLayout Grid.Column="1" 
+                                                         Margin="16,0,8,0" 
+                                                         VerticalOptions="Center">
+                                                <Label Text="{Binding Name}" Style="{StaticResource NameLabelStyle}" />
+                                                <Label Text="{Binding Email}" Style="{StaticResource EmailLabelStyle}" />
+                                            </StackLayout>
+
+                                            <!-- Action Buttons -->
+                                            <StackLayout Grid.Column="2" 
+                                                         Orientation="Horizontal" 
+                                                         VerticalOptions="Center">
+                                                <Button Text="💬"
+                                                        Style="{StaticResource MessageButtonStyle}"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FriendViewModel}}, Path=MessageFriendCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                                <Button Text="🗑️"
+                                                        Style="{StaticResource DeleteButtonStyle}"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FriendViewModel}}, Path=RemoveFriendCommand}"
+                                                        CommandParameter="{Binding Id}" />
+                                            </StackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </StackLayout>
+
+                    <!-- Pending Requests -->
+                    <StackLayout IsVisible="{Binding PendingRequests.Count, Converter={StaticResource IntToBoolConverter}}">
+                        <Label Text="Yêu cầu kết bạn" Style="{StaticResource SectionHeaderStyle}" />
+
+                        <CollectionView ItemsSource="{Binding PendingRequests}"
+                                        BackgroundColor="Transparent"
+                                        SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="dtos:UserDto">
+                                    <Border Style="{StaticResource PendingRequestCardStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Avatar with pending indicator -->
+                                            <Grid Grid.Column="0">
+                                                <Border WidthRequest="48"
+                                                        HeightRequest="48"
+                                                        BackgroundColor="#FF9800"
+                                                        StrokeShape="RoundRectangle 24">
+                                                    <Border.Shadow>
+                                                        <Shadow Brush="#FF9800" Opacity="0.3" Radius="4" Offset="0,2" />
+                                                    </Border.Shadow>
+                                                    <Label Text="{Binding Name, Converter={StaticResource InitialLetterConverter}}"
+                                                           FontSize="18"
+                                                           FontAttributes="Bold"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center" />
+                                                </Border>
+                                                <!-- Pending indicator -->
+                                                <Border WidthRequest="16"
+                                                        HeightRequest="16"
+                                                        BackgroundColor="#E91E63"
+                                                        StrokeShape="RoundRectangle 8"
+                                                        HorizontalOptions="End"
+                                                        VerticalOptions="Start"
+                                                        Margin="0,-4,-4,0">
+                                                    <Label Text="!"
+                                                           FontSize="10"
+                                                           FontAttributes="Bold"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center" />
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- User Info -->
+                                            <StackLayout Grid.Column="1" 
+                                                         Margin="16,0,8,0" 
+                                                         VerticalOptions="Center">
+                                                <Label Text="{Binding Name}" Style="{StaticResource NameLabelStyle}" />
+                                                <Label Text="{Binding Email}" Style="{StaticResource EmailLabelStyle}" />
+                                                <Label Text="Muốn kết bạn với bạn" 
+                                                       FontSize="12" 
+                                                       TextColor="#FF6F00" 
+                                                       FontAttributes="Italic"
+                                                       Margin="0,2,0,0" />
+                                            </StackLayout>
+
+                                            <!-- Action Buttons -->
+                                            <StackLayout Grid.Column="2" 
+                                                         Orientation="Horizontal" 
+                                                         VerticalOptions="Center">
+                                                <Button Text="✓"
+                                                        Style="{StaticResource PrimaryActionButtonStyle}"
+                                                        FontSize="16"
+                                                        WidthRequest="44"
+                                                        HeightRequest="44"
+                                                        CornerRadius="22"
+                                                        Padding="0"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FriendViewModel}}, Path=AcceptFriendRequestCommand}"
+                                                        CommandParameter="{Binding Id}" />
+                                                <Button Text="✗"
+                                                        Style="{StaticResource DeleteButtonStyle}"
+                                                        FontSize="16"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FriendViewModel}}, Path=RejectFriendRequestCommand}"
+                                                        CommandParameter="{Binding Id}" />
+                                            </StackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </StackLayout>
+
+                </StackLayout>
+            </ScrollView>
+        </RefreshView>
+
+        <!-- Loading Overlay -->
+        <Grid Grid.Row="0" Grid.RowSpan="3"
+              IsVisible="{Binding IsBusy}"
+              BackgroundColor="#CC000000">
+            <Border BackgroundColor="White"
+                    Padding="32,24"
+                    StrokeShape="RoundRectangle 16"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    MaximumWidthRequest="280">
+                <StackLayout Spacing="16">
+                    <ActivityIndicator IsRunning="True" 
+                                       Color="#3498DB" 
+                                       WidthRequest="40" 
+                                       HeightRequest="40"
+                                       HorizontalOptions="Center" />
+                    <Label Text="Đang tải danh sách bạn bè..."
+                           TextColor="#2C3E50"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                </StackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Floating Action Button -->
+        <Border Grid.Row="2"
+                BackgroundColor="#27AE60"
+                StrokeShape="RoundRectangle 28"
+                WidthRequest="56"
+                HeightRequest="56"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="24,0,24,24">
+            <Border.Shadow>
+                <Shadow Brush="#27AE60" Opacity="0.4" Radius="8" Offset="0,4" />
+            </Border.Shadow>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding SendFriendRequestCommand}" />
+            </Border.GestureRecognizers>
+            <Label Text="+"
+                   FontSize="32"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+        </Border>
+    </Grid>
+</ContentPage>

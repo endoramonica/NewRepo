@@ -90,6 +90,12 @@ namespace SocialApp.Api.Data
                  .WithMany()
                  .HasForeignKey(f => f.FollowingId)
                  .OnDelete(DeleteBehavior.Restrict);
+                modelBuilder.Entity<Follow>()
+                .HasIndex(f => new { f.FollowerId, f.IsActive })
+                .HasDatabaseName("IX_Follows_FollowerId_IsActive");
+                modelBuilder.Entity<Follow>()
+                    .HasIndex(f => new { f.FollowingId, f.IsActive })
+                    .HasDatabaseName("IX_Follows_FollowingId_IsActive");
             });
 
             // Cấu hình bảng UserFriend

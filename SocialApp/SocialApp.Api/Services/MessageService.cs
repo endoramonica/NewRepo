@@ -3,6 +3,7 @@ using SocialApp.Api.Data;
 using SocialApp.Api.Data.Entities;
 using SocialApp.Api.ServiceInterface;
 using SocialAppLibrary.Shared.Dtos;
+using SocialAppLibrary.Shared.Dtos.ChatDto;
 
 
 namespace SocialApp.Api.Services

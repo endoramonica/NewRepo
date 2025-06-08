@@ -1,0 +1,1 @@
+﻿public record ConnectionRequest(Guid UserId, string ConnectionId);

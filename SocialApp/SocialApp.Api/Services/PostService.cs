@@ -561,7 +561,7 @@ namespace SocialApp.Api.Services
 
                     );
                     await SaveNotificationAsync(notificationDto);
-                    await _hubContext.Clients.All.NotificationGenerated(notificationDto);
+                    await _hubContext.Clients.All.ReceiveNotification(notificationDto);
                 }
                 return ApiResult.Success(); // Trả về kết quả thành công
             }
@@ -613,7 +613,7 @@ namespace SocialApp.Api.Services
 
                     );
                     await SaveNotificationAsync(notificationDto);
-                    await _hubContext.Clients.All.NotificationGenerated(notificationDto);
+                    await _hubContext.Clients.All.ReceiveNotification(notificationDto);
                 }
                 return ApiResult.Success(); // Trả về kết quả thành công
             }

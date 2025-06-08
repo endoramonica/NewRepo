@@ -22,6 +22,7 @@ namespace SocialApp.App
         {
             var builder = MauiApp.CreateBuilder();
             builder
+                
                 .UseMauiCommunityToolkit() // Đảm bảo Toolkit được sử dụng
                 .UseMauiApp<App>()
                 .ConfigureSyncfusionCore() // Đảm bảo Syncfusion được sử dụng
@@ -45,14 +46,21 @@ namespace SocialApp.App
             builder.Services.AddTransient<DetailsViewModel>().AddTransient<PostDetailsPage>();
             builder.Services.AddTransient<ProfileViewModel>().AddTransient<Profile>();
             builder.Services.AddTransient<NotificationViewModel>().AddTransient<NotificationPage>();
-            builder.Services.AddTransient<FollowViewModel>().AddTransient<FollowPage>();
+
+            builder.Services.AddTransient<FriendViewModel>().AddTransient<FriendsPage>();
+
+            //builder.Services.AddTransient<PendingRequestsPage>();
+            //builder.Services.AddTransient<SendFriendRequestPage>();
+
+
 
             builder.Services.AddTransient<InitPage>();
             builder.Services.AddSingleton<IAppPreferences, AppPreferences>();
             builder.Services.AddSingleton<HomeViewModels>().AddSingleton<HomePage>();
             builder.Services.AddSingleton<RealTimeUpdatesService>();
-
+           
             ConfigureRefit(builder.Services);
+            
             return builder.Build();
         }
         private static void ConfigureRefit(IServiceCollection services)
@@ -73,7 +81,13 @@ namespace SocialApp.App
 
             services.AddRefitClient<IFollowApi>(GetRefitSettings)
                 .ConfigureHttpClient(SetHttpClient);
-
+            services.AddRefitClient<IListChatService>(GetRefitSettings)
+                .ConfigureHttpClient(SetHttpClient);
+            services.AddRefitClient<IChatApi>(GetRefitSettings)
+                .ConfigureHttpClient(SetHttpClient);
+            services.AddRefitClient<IUserFriendService>(GetRefitSettings)
+                .ConfigureHttpClient(SetHttpClient);
+            
             void SetHttpClient(HttpClient httpClient)
             {
                 httpClient.BaseAddress = new Uri(AppConstants.ApiBaseUrl);

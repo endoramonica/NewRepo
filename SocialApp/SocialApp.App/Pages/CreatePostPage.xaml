@@ -5,191 +5,241 @@
              xmlns:vm="clr-namespace:SocialApp.App.ViewModels"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SocialApp.App.Pages.CreatePostPage"
-             Padding="10,15"
+             BackgroundColor="#F8F9FA"
+             Padding="0"
              x:DataType="vm:SavePostViewModel">
-    <!--Để tạo NullOrEmptyToBoolConverter, bạn có thể thêm mã sau trong phần resources của XAML:-->
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <controls:NullOrEmptyToBoolConverter x:Key="NullOrEmptyToBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-    <!-- Page title: "Tạo bài viết" (Create Post)
-         Các Namespace: để sử dụng các thành phần trong MAUI, các control tùy chỉnh, và ViewModel -->
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
-        <!-- Khởi tạo một Grid với 5 hàng, định nghĩa cấu trúc bố cục cho các phần trong trang -->
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
 
         <!-- ===== HEADER ===== -->
-        <Grid ColumnDefinitions="*,*,Auto"
+        <Grid ColumnDefinitions="Auto,*,Auto"
               Grid.Row="0"
-              Padding="10">
-            <!-- Header của trang chứa thông tin điều hướng và avatar người dùng -->
+              BackgroundColor="White"
+              Padding="15,10">
+            <!-- Shadow effect for header -->
+            <Grid.Shadow>
+                <Shadow Brush="Gray" Offset="0,2" Radius="4" Opacity="0.1"/>
+            </Grid.Shadow>
 
-            <!-- Label trái với chức năng "back" -->
-            <Label Grid.Column="0"
-                   BackgroundColor="LightBlue"
-                   HorizontalOptions="Center"
-                   Text="back"
-                   VerticalOptions="Center">
-                <Label.GestureRecognizers>
+            <!-- Back button -->
+            <Button Grid.Column="0"
+                    Text="← Quay lại"
+                    BackgroundColor="Transparent"
+                    TextColor="#1877F2"
+                    FontSize="16"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    Padding="0">
+                <Button.GestureRecognizers>
                     <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
-                    <!-- GestureRecognizer để xử lý sự kiện tap trên "back" -->
-                </Label.GestureRecognizers>
-            </Label>
+                </Button.GestureRecognizers>
+            </Button>
 
-            <!-- Label giữa có thể là tiêu đề hoặc các thông tin khác -->
-            <Label Grid.Column="1"
-                   BackgroundColor="LightGreen"
-                   HorizontalOptions="Center"
-                   Text="Cột 2"
-                   VerticalOptions="Center" />
+            <!-- Title -->
+            
 
-            <!-- Grid chứa ảnh avatar và tên người dùng -->
+            <!-- User avatar and name -->
             <Grid ColumnDefinitions="Auto, *"
                   Grid.Column="2"
-                  VerticalOptions="Start">
-                <Image Aspect="AspectFill"
-                       Grid.Column="0"
-                       HeightRequest="50"
-                       Source="account_circle.png"
-                       WidthRequest="50">
-                    <!-- Avatar của người dùng -->
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnAvatarTapped" />
-                        <!-- GestureRecognizer cho sự kiện tap trên avatar -->
-                    </Image.GestureRecognizers>
-                </Image>
-                <Label FontAttributes="Bold"
-                       FontSize="16"
-                       Grid.Column="1"
-                       Margin="10,0,0,0"
-                       Text="Người dùng"
-                       VerticalOptions="Center" />
-                <!-- Tên người dùng -->
+                  VerticalOptions="Center">
+                <Border Grid.Column="0"
+                        WidthRequest="40"
+                        HeightRequest="40"
+                        BackgroundColor="#E4E6EA"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20" />
+                    </Border.StrokeShape>
+                    
+                </Border>
+                
             </Grid>
         </Grid>
 
-        <!-- ===== SCROLL VIEW NỘI DUNG ===== -->
+        <!-- ===== SCROLL VIEW CONTENT ===== -->
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="10"
-                                 Spacing="15">
-                <!-- VerticalStackLayout chứa các thành phần nhập liệu -->
+            <VerticalStackLayout Padding="15"
+                                 Spacing="20">
 
-                <!-- Ô nhập nội dung -->
-                <Border BackgroundColor="Yellow"
-                        Stroke="Gray"
+                <!-- Content input area -->
+                <Border BackgroundColor="White"
+                        Stroke="#E4E6EA"
                         StrokeThickness="1">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="10" />
+                        <RoundRectangle CornerRadius="12" />
                     </Border.StrokeShape>
-                    <Editor FontSize="25"
-                            HeightRequest="100"
-                            Margin="10"
+                    <Border.Shadow>
+                        <Shadow Brush="Gray" Offset="0,1" Radius="3" Opacity="0.1"/>
+                    </Border.Shadow>
+                    <Editor FontSize="16"
+                            MinimumHeightRequest="120"
+                            Margin="15"
                             Placeholder="Bạn đang nghĩ gì?"
+                            PlaceholderColor="#8A8D91"
                             Text="{Binding Content}"
+                            TextColor="#1C1E21"
+                            BackgroundColor="Transparent"
                             VerticalOptions="Start" />
                 </Border>
-                <!-- Đây là khu vực nhập liệu cho nội dung bài viết, sử dụng Editor -->
 
-                <!-- Tùy chọn đính kèm -->
+                <!-- Attachment options -->
                 <Grid ColumnDefinitions="*,*,*,*"
-                      ColumnSpacing="10"
-                      RowDefinitions="Auto,*">
-                    <!-- Các nút lựa chọn để đính kèm vị trí, tag bạn bè, ảnh/video, cảm xúc -->
-                    <Button BackgroundColor="Transparent"
-                            Clicked="OnAddLocationClicked"
-                            Grid.Column="0"
-                            Text="😄 Vị trí"
-                            TextColor="Black" />
+                      ColumnSpacing="8"
+                      RowDefinitions="Auto,Auto">
 
-                    <Button BackgroundColor="Transparent"
-                            Clicked="OnTagFriendsClicked"
-                            Grid.Column="1"
-                            ImageSource="tag_icon.png"
-                            Text="😽 Tag bạn bè"
-                            TextColor="Black" />
+                    <!-- Location button -->
+                    <Border Grid.Column="0"
+                            BackgroundColor="White"
+                            Stroke="#E4E6EA"
+                            StrokeThickness="1"
+                            Padding="12,8">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Button BackgroundColor="Transparent"
+                                Clicked="OnAddLocationClicked"
+                                Text="📍 Vị trí"
+                                TextColor="#42B883"
+                                FontSize="12"
+                                Padding="0" />
+                    </Border>
 
-                    <Button BackgroundColor="Pink"
-                            
-                            Grid.Column="2"
-                            ImageSource="image_icon.png"
-                            Text="Ảnh/Video" >
-                    <!-- Thêm TapGestureRecognizer để gọi command SelectPhotoCommand khi nhấn -->
-                    <Button.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding SelectPhotoCommand}" />
-                    </Button.GestureRecognizers>
-                        <!-- DataTriggers để kiểm tra sự thay đổi của PhotoPath và ẩn/hiện nút -->
-                        <Button.Triggers>
-                            <DataTrigger TargetType="Button"
-                                         Binding="{Binding PhotoPath}"
-                                         Value="">
-                                <Setter Property="IsVisible"
-                                        Value="True" />
-                               
-                                <!-- Hiện nút khi không có ảnh -->
-                          
-                                <!-- Ẩn nút khi có ảnh -->
-                            </DataTrigger>
-                        </Button.Triggers>
-                    </Button>
-                    <!-- Nút thêm ảnh/video với biểu tượng ảnh -->
+                    <!-- Tag friends button -->
+                    <Border Grid.Column="1"
+                            BackgroundColor="White"
+                            Stroke="#E4E6EA"
+                            StrokeThickness="1"
+                            Padding="12,8">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Button BackgroundColor="Transparent"
+                                Clicked="OnTagFriendsClicked"
+                                Text="👥 Tag"
+                                TextColor="#FF6B6B"
+                                FontSize="12"
+                                Padding="0" />
+                    </Border>
 
-                    <Button BackgroundColor="Transparent"
-                            Clicked="OnAddEmotionClicked"
-                            Grid.Column="3"
-                            ImageSource="emotion_icon.png"
-                            Text="Cảm xúc"
-                            TextColor="Black" />
+                    <!-- Photo/Video button -->
+                    <Border Grid.Column="2"
+                            BackgroundColor="White"
+                            Stroke="#E4E6EA"
+                            StrokeThickness="1"
+                            Padding="12,8">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Button BackgroundColor="Transparent"
+                                Text="📷 Ảnh"
+                                TextColor="#4ECDC4"
+                                FontSize="12"
+                                Padding="0">
+                            <Button.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectPhotoCommand}" />
+                            </Button.GestureRecognizers>
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button"
+                                             Binding="{Binding PhotoPath}"
+                                             Value="">
+                                    <Setter Property="IsVisible" Value="True" />
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                    </Border>
+
+                    <!-- Emotion button -->
+                    <Border Grid.Column="3"
+                            BackgroundColor="White"
+                            Stroke="#E4E6EA"
+                            StrokeThickness="1"
+                            Padding="12,8">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Button BackgroundColor="Transparent"
+                                Clicked="OnAddEmotionClicked"
+                                Text="😊 Cảm xúc"
+                                TextColor="#FFD93D"
+                                FontSize="12"
+                                Padding="0" />
+                    </Border>
                 </Grid>
 
-                <!-- Đây là phần chứa các tùy chọn đính kèm (vị trí, ảnh, cảm xúc, tag) -->
-                <!-- ===== Nút xóa nằm phía trên hình ảnh ===== -->
-                <Button Text="Xóa"
-                        CornerRadius="15"
+                <!-- Remove photo button -->
+                <Button Text="✕ Xóa ảnh"
+                        BackgroundColor="#FF6B6B"
+                        TextColor="White"
+                        CornerRadius="20"
+                        FontSize="14"
                         IsVisible="{Binding PhotoPath, Converter={StaticResource NullOrEmptyToBoolConverter}}"
                         Command="{Binding RemovePhotoAsyncCommand}"
                         VerticalOptions="Start"
                         HorizontalOptions="End"
-                        Margin="0,10,0,0" />
+                        Padding="15,8"
+                        Margin="0,5,0,0" />
 
-                <!-- ===== Khung Border chứa hình ảnh ===== -->
+                <!-- Photo preview -->
                 <Border HeightRequest="250"
-                        StrokeThickness="0"
+                        BackgroundColor="White"
+                        Stroke="#E4E6EA"
+                        StrokeThickness="1"
                         Grid.Row="1">
-                    <!-- DataTrigger để bật/tắt Border khi có ảnh -->
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    <Border.Shadow>
+                        <Shadow Brush="Gray" Offset="0,2" Radius="4" Opacity="0.1"/>
+                    </Border.Shadow>
                     <Border.Triggers>
                         <DataTrigger TargetType="Border"
                                      Binding="{Binding PhotoPath}"
                                      Value="">
-                            <Setter Property="IsVisible"
-                                    Value="False" />
-                            <!-- Ẩn khi không có ảnh -->
+                            <Setter Property="IsVisible" Value="False" />
                         </DataTrigger>
                     </Border.Triggers>
 
-                    <!-- Hình ảnh bên trong Border -->
                     <Image HeightRequest="250"
-                           Source="{Binding PhotoPath}" />
+                           Source="{Binding PhotoPath}"
+                           Aspect="AspectFill" />
                 </Border>
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- ===== NÚT ĐĂNG ===== -->
-        <Button BackgroundColor="#1877F2"
-               
-                CornerRadius="25"
-                FontAttributes="Bold"
-                FontSize="20"
-                Grid.Row="3"
-                Text="Đăng"
-                TextColor="White"
-                Command="{Binding SavePostCommand}" />
-        <!-- Nút đăng bài, khi bấm sẽ gọi command SavePostCommand trong ViewModel -->
-        <!-- ===== ActivityIndicator ===== -->
-        <ActivityIndicator 
-                                   IsRunning="{Binding IsBusy}" 
-                                   VerticalOptions="Center" 
-                                   HorizontalOptions="Center" 
-                                   Color="Blue" />
+        <!-- ===== POST BUTTON ===== -->
+        <Border Grid.Row="2"
+                BackgroundColor="White"
+                Padding="15,10">
+            <Border.Shadow>
+                <Shadow Brush="Gray" Offset="0,-2" Radius="4" Opacity="0.1"/>
+            </Border.Shadow>
+
+            <Button BackgroundColor="#1877F2"
+                    CornerRadius="25"
+                    FontAttributes="Bold"
+                    FontSize="16"
+                    Text="📝 Đăng bài"
+                    TextColor="White"
+                    Command="{Binding SavePostCommand}"
+                    HeightRequest="50">
+                <Button.Shadow>
+                    <Shadow Brush="#1877F2" Offset="0,2" Radius="8" Opacity="0.3"/>
+                </Button.Shadow>
+            </Button>
+        </Border>
+
+        <!-- ===== ACTIVITY INDICATOR ===== -->
+        <ActivityIndicator Grid.RowSpan="4"
+                          IsRunning="{Binding IsBusy}" 
+                          VerticalOptions="Center" 
+                          HorizontalOptions="Center" 
+                          Color="#1877F2"
+                          BackgroundColor="#80000000" />
     </Grid>
 </ContentPage>

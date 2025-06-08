@@ -17,6 +17,7 @@ namespace SocialApp.App.Pages
             _homeViewModels = homeViewModels;
             _realTimeUpdatesService = realTimeUpdatesService;
         }
+
         protected override void OnAppearing()
         {
             base.OnAppearing();

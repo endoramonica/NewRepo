@@ -23,6 +23,7 @@ namespace SocialApp.Api.Hubs
             await Clients.User(notification.FollowerId.ToString()).FollowNotification(notification);
         }
 
+
     }   
     
 }

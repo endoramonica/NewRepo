@@ -11,9 +11,19 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+                <ResourceDictionary>
+                    <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
 
-
+           
+            
+                <Style x:Key="FadedLineStyle" TargetType="BoxView">
+                    <Setter Property="HeightRequest" Value="1" />
+                    <Setter Property="BackgroundColor" Value="#E0E0E0" />
+                    <Setter Property="HorizontalOptions" Value="Fill" />
+                </Style>
+            
 
             <!-- Tệp chứa các Key -->
             <!-- Style cho Button với bo góc 20 -->
@@ -46,18 +56,7 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <Style x:Key="FadedLineStyle" TargetType="BoxView">
-                <Setter Property="HeightRequest" Value="1"/>
-                <!-- Độ dày của đường kẻ -->
-                <Setter Property="BackgroundColor" Value="Gray"/>
-                <!-- Màu của đường kẻ -->
-                <Setter Property="Opacity" Value="0.5"/>
-                <!-- Độ trong suốt (mờ) -->
-                <Setter Property="HorizontalOptions" Value="Fill"/>
-                <!-- Chiều ngang toàn bộ -->
-                <Setter Property="VerticalOptions" Value="Center"/>
-                <!-- Căn giữa theo chiều dọc -->
-            </Style>
+            
             <!-- Style cho CheckBox -->
             <Style x:Key="CheckBoxStyle" TargetType="CheckBox">
                 <Setter Property="Color" Value="Green"/>

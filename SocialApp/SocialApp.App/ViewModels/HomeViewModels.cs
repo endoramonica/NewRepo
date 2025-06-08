@@ -22,18 +22,20 @@ namespace SocialApp.App.ViewModels
     {
         private readonly RealTimeUpdatesService _realTimeUpdatesService;
         private readonly AuthService _authService;
+        
 
-        public HomeViewModels(IPostApi postApi, RealTimeUpdatesService realTimeUpdatesService, AuthService authService) : base(postApi)
+        public ObservableCollection<PostModel> Posts { get; set; } = [];
+        
+
+        public HomeViewModels(IPostApi postApi, IFollowApi followApi, IUserApi userApi, RealTimeUpdatesService realTimeUpdatesService, AuthService authService)
+            : base(postApi)
         {
-
-            FetchPostAsync();
             _realTimeUpdatesService = realTimeUpdatesService;
             _authService = authService;
+           
+            FetchPostAsync();
             ConfigureRealTimeUpdates();
         }
-        public ObservableCollection<PostModel> Posts { get; set; } = [];
-        //public ObservableCollection<PostDto> Posts { get; set; } = new ObservableCollection<PostDto>();
-
         private int _startIndex = 0;
         private const int PageSize = 10;
 
@@ -104,9 +106,15 @@ namespace SocialApp.App.ViewModels
         }
         private void OnNotificationGenerated(NotificationDto notification)
         {
+            Debug.WriteLine($"[OnNotificationGenerated] Received notification for UserId: {notification.ForUserId}, Current UserId: {_authService.User.ID}");
             if (notification.ForUserId == _authService.User.ID)
             {
+                Debug.WriteLine("[OnNotificationGenerated] Setting IsThereNewNotification to true");
                 IsThereNewNotification = true;
+            }
+            else
+            {
+                Debug.WriteLine("[OnNotificationGenerated] User ID mismatch, not updating IsThereNewNotification");
             }
         }
         #region Methods
@@ -169,18 +177,18 @@ namespace SocialApp.App.ViewModels
             }
         }
         [RelayCommand]
-        private async Task NavigateToFollowAsync()
+        private async Task NavigateToFriendAsync()
         {
             try
             {
-                await NavigationAsync("//FollowPage");
-                Debug.WriteLine("➡️ [NavigateToFollowAsync] Điều hướng đến Profile");
-                await ToastAsync("Chuyển đến trang follow!");
+                await NavigationAsync("//FriendsPage");
+                Debug.WriteLine("➡️ [NavigateToFriendAsync] Điều hướng đến Friend");
+                await ToastAsync("Chuyển đến trang friend!");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"🚨 [NavigateToFollowAsync] Lỗi khi điều hướng: {ex.Message}");
-                await ShowErrorAlertAsync("Không thể điều hướng đến trang follow.");
+                Debug.WriteLine($"🚨 [NavigateToFriendAsync] Lỗi khi điều hướng: {ex.Message}");
+                await ShowErrorAlertAsync("Không thể điều hướng đến trang friend.");
             }
         }
 

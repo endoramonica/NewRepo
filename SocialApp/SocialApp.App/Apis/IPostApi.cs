@@ -7,16 +7,7 @@ namespace SocialApp.App.Apis;
 [Headers("Authorization: Bearer ")]
 public interface IPostApi
 {
-    //[Multipart]
-    //[Post("/api/posts/save")]
-    //Task<ApiResult> SavePostAsync(StreamPart? photo, string serializedSavePostDto);
-
-    //[Multipart]
-    //[Post("/api/posts/save")]
-    //Task<ApiResult> SavePostAsync(
-    //     [AliasAs("photo")] IFormFile? photo, // Không cần [FromForm] vì Refit tự hiểu trong Multipart
-    //     [AliasAs("SerializedSavePostDto")] string serializedSavePostDto
-    // );
+    
     [Multipart]
     [Post("/api/posts/save")]
     Task<ApiResult<PostDto>> SavePostAsync([AliasAs("photo")] StreamPart? photo, [AliasAs("SerializedSavePostDto")] string? SerializedSavePostDto);

@@ -1,5 +1,6 @@
 ﻿using SocialApp.Api.Services;
 using SocialAppLibrary.Shared.Dtos;
+using SocialAppLibrary.Shared.Dtos.ChatDto;
 using System.Security.Claims;
 //#22
 

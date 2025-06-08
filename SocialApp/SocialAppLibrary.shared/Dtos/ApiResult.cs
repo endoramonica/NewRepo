@@ -1,4 +1,5 @@
-﻿namespace SocialAppLibrary.Shared.Dtos
+﻿
+namespace SocialAppLibrary.Shared.Dtos
 {
     public record ApiResult(bool IsSuccess, string? Error)
     {
@@ -9,5 +10,10 @@
     {
         public static ApiResult<TData> Success(TData data) => new(true, data, null);
         public static ApiResult<TData> Fail(string errorMessage) => new(false, default!, errorMessage);
+
+        public static implicit operator ApiResult<TData>(ApiResult<string> v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

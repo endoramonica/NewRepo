@@ -19,8 +19,8 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Priority="4" Text="Tiêu đề" />
         <ToolbarItem IconImageSource="logout.png" Command="{Binding LogoutCommand}" Priority="0" Order="Primary"/>
-        <ToolbarItem IconImageSource="settings.png" Command="{Binding OpenSettingsCommand}" Priority="1" Order="Primary"/>
-        <ToolbarItem IconImageSource="apple_icon.png" Command="{Binding CustomActionCommand}" Priority="2" Order="Primary"/>
+        <ToolbarItem IconImageSource="home.png" Command="{Binding OpenSettingsCommand}" Priority="1" Order="Primary"/>
+       
         <ToolbarItem Text="Thêm" Command="{Binding AdditionalActionCommand}" Priority="3" Order="Secondary"/>
     </ContentPage.ToolbarItems>
 
@@ -117,24 +117,45 @@
                 <!-- Danh sách bài viết -->
                 <!-- My Posts -->
                 <CollectionView IsVisible="{Binding IsMyPostTabSelected}"
-                    ItemsSource="{Binding MyPosts}"
+                    ItemsSource="{Binding MyPosts}"   Margin="10,5" 
                     ItemTemplate="{StaticResource postDataTemplateSelector}"
                     RemainingItemsThreshold="2"
-                    RemainingItemsThresholdReachedCommand="{Binding FetchMyPostsCommand}" />
+                    RemainingItemsThresholdReachedCommand="{Binding FetchMyPostsCommand}" >
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="20" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Image Source="empty.png" WidthRequest="100" HeightRequest="100"/>
+                            <Label Text="Bạn chưa đăng bài nào." TextColor="Gray" FontAttributes="Italic" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                </CollectionView>
 
                 <!-- Bookmarked -->
                 <CollectionView IsVisible="{Binding IsBookMarkedTabSelected}"
                     ItemsSource="{Binding BookMarkedPost}"
                     ItemTemplate="{StaticResource postDataTemplateSelector}"
                     RemainingItemsThreshold="2"
-                    RemainingItemsThresholdReachedCommand="{Binding FetchBookmarkedPostCommand}" />
+                    RemainingItemsThresholdReachedCommand="{Binding FetchBookmarkedPostsCommand}" >
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="20" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Image Source="empty.png" WidthRequest="100" HeightRequest="100"/>
+                            <Label Text="Chưa có bài viết nào được lưu dấu." TextColor="Gray" FontAttributes="Italic" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                </CollectionView>
 
                 <!-- Liked -->
                 <CollectionView IsVisible="{Binding IsLikedTabSelected}"
                     ItemsSource="{Binding LikedPosts}"
                     ItemTemplate="{StaticResource postDataTemplateSelector}"
                     RemainingItemsThreshold="2"
-                    RemainingItemsThresholdReachedCommand="{Binding FetchLikedPostsCommand}" />
+                    RemainingItemsThresholdReachedCommand="{Binding FetchLikedPostsCommand}" >
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="20" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Image Source="empty.png" WidthRequest="100" HeightRequest="100"/>
+                            <Label Text="Chưa có bài viết nào bạn thích." TextColor="Gray" FontAttributes="Italic" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                </CollectionView>
             </VerticalStackLayout>
         </ScrollView>
         <!-- ActivityIndicator với lớp phủ -->

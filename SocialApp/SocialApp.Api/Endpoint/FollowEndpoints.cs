@@ -52,7 +52,32 @@ namespace SocialApp.Api.Endpoint
             })
             .Produces<ApiResult<LoggedInUser[]>>()
             .WithName("SearchFollowers");
+            // Thêm endpoint mới cho IsFollowing
+            followGroup.MapGet("/is-following", async ([FromServices] IFollowService followService, ClaimsPrincipal principal, [FromQuery] Guid followingId) =>
+            {
+                var followerId = principal.GetUserId();
+                var result = await followService.IsFollowingAsync(followerId, followingId);
+                return Results.Ok(result);
+            })
+            .Produces<ApiResult<bool>>()
+            .WithName("IsFollowing");
+            followGroup.MapGet("/follower-count", async ([FromServices] IFollowService followService, ClaimsPrincipal principal) =>
+            {
+                var userId = principal.GetUserId();
+                var result = await followService.GetFollowerCountAsync(userId);
+                return Results.Ok(result);
+            })
+            .Produces<ApiResult<int>>()
+            .WithName("GetFollowerCount");
 
+            followGroup.MapGet("/following-count", async ([FromServices] IFollowService followService, ClaimsPrincipal principal) =>
+            {
+                var userId = principal.GetUserId();
+                var result = await followService.GetFollowingCountAsync(userId);
+                return Results.Ok(result);
+            })
+            .Produces<ApiResult<int>>()
+            .WithName("GetFollowingCount");
             return app;
         }
     }

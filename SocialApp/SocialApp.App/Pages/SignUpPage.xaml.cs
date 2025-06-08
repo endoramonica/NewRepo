@@ -12,8 +12,5 @@ public partial class SignUpPage : ContentPage
 
     
 
-    private async void Button_Clicked_1(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("///LoginPage");
-    }
+    
 }

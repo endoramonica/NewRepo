@@ -30,7 +30,7 @@ public class InitPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
+        _authService.Initialize(); // Khởi tạo AuthService
         if (!Preferences.Default.ContainsKey(FirstRunKey))
         {
             Preferences.Set(FirstRunKey, true);
@@ -38,11 +38,7 @@ public class InitPage : ContentPage
             return;
         }
 
-        if (Preferences.Get("RememberLogin", true) && _authService.IsLoggedIn)
-        {
-            await Shell.Current.GoToAsync($"//{nameof(HomePage)}");
-            return;
-        }
+        
 
         if (_authService.IsLoggedIn)
         {

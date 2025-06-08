@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using SocialApp.Api.Data;
 using SocialApp.Api.Data.Entities;
 using SocialAppLibrary.Shared.Dtos;
+using SocialAppLibrary.Shared.Dtos.ChatDto;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
