@@ -24,7 +24,7 @@
                             <TapGestureRecognizer Command="{Binding NavigateToNotificationCommand}" />
                         </Image.GestureRecognizers>
                     </Image>
-                    <Ellipse Fill="Yellow" WidthRequest="12" HeightRequest="12" Stroke="Red" StrokeThickness="2" 
+                    <Ellipse Fill="Blue" WidthRequest="20" HeightRequest="20" Stroke="Red" StrokeThickness="2" 
                          VerticalOptions="Start" HorizontalOptions="End" Margin="2" 
                          IsVisible="{Binding IsThereNewNotification}"/>
                 </Grid>

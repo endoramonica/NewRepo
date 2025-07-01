@@ -151,7 +151,7 @@
                     RemainingItemsThresholdReachedCommand="{Binding FetchLikedPostsCommand}" >
                     <CollectionView.EmptyView>
                         <VerticalStackLayout Padding="20" HorizontalOptions="Center" VerticalOptions="Center">
-                            <Image Source="empty.png" WidthRequest="100" HeightRequest="100"/>
+                          
                             <Label Text="Chưa có bài viết nào bạn thích." TextColor="Gray" FontAttributes="Italic" HorizontalOptions="Center"/>
                         </VerticalStackLayout>
                     </CollectionView.EmptyView>
